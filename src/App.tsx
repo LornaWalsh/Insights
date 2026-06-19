@@ -4,6 +4,7 @@ import { AuthProvider } from '@/hooks/useAuth'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import { AppShell } from '@/components/layout/AppShell'
 import LoginPage from '@/pages/auth/LoginPage'
+import OnboardingPage from '@/pages/onboarding/OnboardingPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +51,13 @@ export default function App() {
             {/* Public */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+            {/* Onboarding — admin only, no AppShell */}
+            <Route path="/onboarding" element={
+              <RequireAuth allowedRoles={['admin']}>
+                <OnboardingPage />
+              </RequireAuth>
+            } />
 
             {/* Admin + Manager */}
             <Route path="/dashboard" element={<Protected roles={['admin', 'manager']}><ComingSoon title="Dashboard" /></Protected>} />
