@@ -300,3 +300,58 @@ create policy "import_errors_select"
       and public.get_my_role() = 'admin'
     )
   );
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Grants — authenticated users need base table access on top of RLS
+-- ─────────────────────────────────────────────────────────────────────────────
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+
+-- Helper functions with SET row_security = off to prevent RLS recursion
+CREATE OR REPLACE FUNCTION public.get_my_org_id()
+RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+  SELECT organisation_id FROM public.profiles WHERE id = auth.uid();
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_my_role()
+RETURNS public.user_role LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+  SELECT role FROM public.profiles WHERE id = auth.uid();
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_my_channel_id()
+RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+  SELECT channel_id FROM public.profiles WHERE id = auth.uid();
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_platform_admin()
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+  SELECT COALESCE(is_platform_admin, false) FROM public.profiles WHERE id = auth.uid();
+$$;
+
+-- Split profiles_select into separate policies to avoid helper function recursion
+DROP POLICY IF EXISTS "profiles_select" ON public.profiles;
+
+CREATE POLICY "profiles_select_own" ON public.profiles
+  FOR SELECT USING (id = auth.uid());
+
+CREATE POLICY "profiles_select_org" ON public.profiles
+  FOR SELECT USING (
+    organisation_id = public.get_my_org_id()
+    AND public.get_my_role() IN ('admin', 'manager')
+  );
+
+CREATE POLICY "profiles_select_platform" ON public.profiles
+  FOR SELECT USING (public.is_platform_admin());

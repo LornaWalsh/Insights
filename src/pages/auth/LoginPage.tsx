@@ -24,16 +24,26 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+      console.log('[login] calling signInWithPassword...')
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+      console.log('[login] result:', { session: !!data?.session, error: authError?.message })
 
       if (authError) {
         setError(authError.message)
         setLoading(false)
+        return
       }
-      // On success, onAuthStateChange in useAuth fires, fetches profile,
+
+      if (!data.session) {
+        setError('Sign in failed — no session returned. Please try again.')
+        setLoading(false)
+        return
+      }
+
+      // Success — onAuthStateChange in useAuth fires, fetches profile,
       // and the useEffect above handles the redirect
-    } catch {
-      setError('An unexpected error occurred. Please try again.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.')
       setLoading(false)
     }
   }
