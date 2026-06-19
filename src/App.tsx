@@ -5,6 +5,7 @@ import { RequireAuth } from '@/components/auth/RequireAuth'
 import { AppShell } from '@/components/layout/AppShell'
 import LoginPage from '@/pages/auth/LoginPage'
 import OnboardingPage from '@/pages/onboarding/OnboardingPage'
+import PlatformAdminPage from '@/pages/platform/PlatformAdminPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,7 +76,7 @@ export default function App() {
             {/* Platform admin — no AppShell, its own minimal UI */}
             <Route path="/platform" element={
               <RequireAuth allowedRoles={['platform_admin']}>
-                <ComingSoon title="Platform Admin" />
+                <PlatformAdminPage />
               </RequireAuth>
             } />
 
