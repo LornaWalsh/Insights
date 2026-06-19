@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
@@ -11,37 +11,31 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { profile } = useAuth()
 
-  // If already logged in, redirect to the right place
-  if (profile) {
-    navigate(getHomeForRole(profile.role), { replace: true })
-    return null
-  }
+  // Once useAuth has loaded the profile, redirect to the right place
+  useEffect(() => {
+    if (profile) {
+      navigate(getHomeForRole(profile.role), { replace: true })
+    }
+  }, [profile, navigate])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (authError || !data.user) {
-      setError('Incorrect email or password.')
+      if (authError) {
+        setError(authError.message)
+        setLoading(false)
+      }
+      // On success, onAuthStateChange in useAuth fires, fetches profile,
+      // and the useEffect above handles the redirect
+    } catch {
+      setError('An unexpected error occurred. Please try again.')
       setLoading(false)
-      return
     }
-
-    // Fetch profile to determine where to send them
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .single()
-
-    if (profileData) {
-      navigate(getHomeForRole(profileData.role), { replace: true })
-    }
-
-    setLoading(false)
   }
 
   return (

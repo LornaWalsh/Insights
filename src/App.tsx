@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from '@/hooks/useAuth'
 import { RequireAuth } from '@/components/auth/RequireAuth'
+import { AppShell } from '@/components/layout/AppShell'
 import LoginPage from '@/pages/auth/LoginPage'
 
 const queryClient = new QueryClient({
@@ -12,7 +13,7 @@ const queryClient = new QueryClient({
 
 function ComingSoon({ title }: { title: string }) {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex items-center justify-center h-64">
       <div className="text-center">
         <h1 className="text-xl font-semibold text-foreground">{title}</h1>
         <p className="text-muted-foreground text-sm mt-2">Coming soon</p>
@@ -32,6 +33,14 @@ function UnauthorizedPage() {
   )
 }
 
+function Protected({ roles, children }: { roles: Parameters<typeof RequireAuth>[0]['allowedRoles'], children: React.ReactNode }) {
+  return (
+    <RequireAuth allowedRoles={roles}>
+      <AppShell>{children}</AppShell>
+    </RequireAuth>
+  )
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -43,47 +52,19 @@ export default function App() {
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
             {/* Admin + Manager */}
-            <Route path="/dashboard" element={
-              <RequireAuth allowedRoles={['admin', 'manager']}>
-                <ComingSoon title="Dashboard" />
-              </RequireAuth>
-            } />
-            <Route path="/reports" element={
-              <RequireAuth allowedRoles={['admin', 'manager']}>
-                <ComingSoon title="Reports" />
-              </RequireAuth>
-            } />
+            <Route path="/dashboard" element={<Protected roles={['admin', 'manager']}><ComingSoon title="Dashboard" /></Protected>} />
+            <Route path="/reports"   element={<Protected roles={['admin', 'manager']}><ComingSoon title="Reports" /></Protected>} />
 
             {/* Admin only */}
-            <Route path="/forecasts" element={
-              <RequireAuth allowedRoles={['admin']}>
-                <ComingSoon title="Forecasts" />
-              </RequireAuth>
-            } />
-            <Route path="/import" element={
-              <RequireAuth allowedRoles={['admin']}>
-                <ComingSoon title="Import" />
-              </RequireAuth>
-            } />
-            <Route path="/users" element={
-              <RequireAuth allowedRoles={['admin']}>
-                <ComingSoon title="Users" />
-              </RequireAuth>
-            } />
-            <Route path="/settings" element={
-              <RequireAuth allowedRoles={['admin']}>
-                <ComingSoon title="Settings" />
-              </RequireAuth>
-            } />
+            <Route path="/forecasts" element={<Protected roles={['admin']}><ComingSoon title="Forecasts" /></Protected>} />
+            <Route path="/import"    element={<Protected roles={['admin']}><ComingSoon title="Import" /></Protected>} />
+            <Route path="/users"     element={<Protected roles={['admin']}><ComingSoon title="Users" /></Protected>} />
+            <Route path="/settings"  element={<Protected roles={['admin']}><ComingSoon title="Settings" /></Protected>} />
 
             {/* All authenticated users */}
-            <Route path="/daily-input" element={
-              <RequireAuth allowedRoles={['admin', 'manager', 'staff']}>
-                <ComingSoon title="Daily Input" />
-              </RequireAuth>
-            } />
+            <Route path="/daily-input" element={<Protected roles={['admin', 'manager', 'staff']}><ComingSoon title="Daily Input" /></Protected>} />
 
-            {/* Platform admin */}
+            {/* Platform admin — no AppShell, its own minimal UI */}
             <Route path="/platform" element={
               <RequireAuth allowedRoles={['platform_admin']}>
                 <ComingSoon title="Platform Admin" />

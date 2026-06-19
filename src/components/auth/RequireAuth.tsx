@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
-import { UserRole } from '@/types'
+import type { UserRole } from '@/types'
 
 interface RequireAuthProps {
   children: React.ReactNode
