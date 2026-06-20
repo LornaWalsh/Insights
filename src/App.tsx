@@ -9,6 +9,7 @@ import OnboardingPage from '@/pages/onboarding/OnboardingPage'
 import PlatformAdminPage from '@/pages/platform/PlatformAdminPage'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
 import DailyInputPage from '@/pages/daily-input/DailyInputPage'
+import SettingsPage from '@/pages/settings/SettingsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,7 +73,7 @@ export default function App() {
             <Route path="/forecasts" element={<Protected roles={['admin']}><ComingSoon title="Forecasts" /></Protected>} />
             <Route path="/import"    element={<Protected roles={['admin']}><ComingSoon title="Import" /></Protected>} />
             <Route path="/users"     element={<Protected roles={['admin']}><ComingSoon title="Users" /></Protected>} />
-            <Route path="/settings"  element={<Protected roles={['admin']}><ComingSoon title="Settings" /></Protected>} />
+            <Route path="/settings"  element={<Protected roles={['admin']}><SettingsPage /></Protected>} />
 
             {/* All authenticated users */}
             <Route path="/daily-input" element={<Protected roles={['admin', 'manager', 'staff']}><DailyInputPage /></Protected>} />
