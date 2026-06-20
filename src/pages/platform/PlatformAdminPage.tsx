@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { callFunction } from '@/lib/callFunction'
-import { Building2, Plus, X, Pencil, Trash2 } from 'lucide-react'
+import { Building2, Plus, X, Pencil, Trash2, LogOut } from 'lucide-react'
 
 interface AdminProfile {
   email: string | null
@@ -178,12 +178,21 @@ export default function PlatformAdminPage() {
           <h1 className="text-lg font-bold text-foreground">Platform Admin</h1>
           <p className="text-xs text-muted-foreground">Insight Hub — Lorna Walsh</p>
         </div>
-        <button
-          onClick={() => { setShowCreate(true); setSuccess(''); setError('') }}
-          className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-        >
-          <Plus size={16} /> New organisation
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { setShowCreate(true); setSuccess(''); setError('') }}
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+          >
+            <Plus size={16} /> New organisation
+          </button>
+          <button
+            onClick={() => supabase.auth.signOut().then(() => window.location.href = '/login')}
+            className="flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors"
+            title="Log out"
+          >
+            <LogOut size={16} /> Log out
+          </button>
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
