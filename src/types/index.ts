@@ -55,7 +55,7 @@ export interface DailyPerformance {
   footfall: number | null
   conversion_rate: number | null
   conversion_rate_overridden: boolean
-  returning_customers_pct: number | null
+  returning_customers: number | null
   signups: number | null
   discounted_orders: number | null
   facebook_ad_spend: number | null

@@ -21,7 +21,7 @@ interface FormState {
   footfall: string
   conversion_rate: string
   conversion_rate_overridden: boolean
-  returning_customers_pct: string
+  returning_customers: string
   signups: string
   discounted_orders: string
   facebook_ad_spend: string
@@ -39,7 +39,7 @@ function initForm(existing: DailyPerformance | null): FormState {
     return {
       sales: '', orders: '', returns_value: '', returns_count: '',
       footfall: '', conversion_rate: '', conversion_rate_overridden: false,
-      returning_customers_pct: '', signups: '', discounted_orders: '',
+      returning_customers: '', signups: '', discounted_orders: '',
       facebook_ad_spend: '', google_ad_spend: '', other_ad_spend: '',
       other_ad_spend_notes: '',
     }
@@ -52,7 +52,7 @@ function initForm(existing: DailyPerformance | null): FormState {
     footfall: toStr(existing.footfall),
     conversion_rate: toStr(existing.conversion_rate),
     conversion_rate_overridden: existing.conversion_rate_overridden,
-    returning_customers_pct: toStr(existing.returning_customers_pct),
+    returning_customers: toStr(existing.returning_customers),
     signups: toStr(existing.signups),
     discounted_orders: toStr(existing.discounted_orders),
     facebook_ad_spend: toStr(existing.facebook_ad_spend),
@@ -176,7 +176,7 @@ export function DailyInputForm({ organisationId, channelId, performanceDate, exi
       footfall: form.footfall !== '' ? parseFloat(form.footfall) : null,
       conversion_rate: form.conversion_rate !== '' ? parseFloat(form.conversion_rate) : null,
       conversion_rate_overridden: form.conversion_rate_overridden,
-      returning_customers_pct: form.returning_customers_pct !== '' ? parseFloat(form.returning_customers_pct) : null,
+      returning_customers: form.returning_customers !== '' ? parseInt(form.returning_customers) : null,
       signups: form.signups !== '' ? parseInt(form.signups) : null,
       discounted_orders: form.discounted_orders !== '' ? parseInt(form.discounted_orders) : null,
       facebook_ad_spend: form.facebook_ad_spend !== '' ? parseFloat(form.facebook_ad_spend) : null,
@@ -287,22 +287,7 @@ export function DailyInputForm({ organisationId, channelId, performanceDate, exi
       {/* Engagement */}
       <SectionCard title="Engagement (optional)">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground">Returning customers %</label>
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                value={form.returning_customers_pct}
-                onChange={e => setForm(f => ({ ...f, returning_customers_pct: e.target.value }))}
-                placeholder="0.00"
-                className="w-full px-3 py-2 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              <span className="text-sm text-muted-foreground">%</span>
-            </div>
-          </div>
+          {numericInput('Returning customers', 'returning_customers', form, setForm, { step: '1' })}
           {numericInput('New signups', 'signups', form, setForm, { step: '1' })}
           {numericInput('Discounted orders', 'discounted_orders', form, setForm, { step: '1' })}
         </div>

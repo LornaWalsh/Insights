@@ -166,7 +166,7 @@ create table public.daily_performance (
   footfall                  integer,
   conversion_rate           numeric(6,4),
   conversion_rate_overridden boolean not null default false,
-  returning_customers_pct   numeric(5,2),
+  returning_customers       integer,
   signups                   integer,
   discounted_orders         integer,
   facebook_ad_spend         numeric(12,2),
