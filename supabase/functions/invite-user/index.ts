@@ -43,11 +43,11 @@ Deno.serve(async (req) => {
 
     if (!firm_name || !admin_email) return error('firm_name and admin_email are required', 400)
 
-    // Service role client for privileged operations
+    // Service role client — only needed for auth.admin operations
     const admin = createClient(supabaseUrl, serviceKey)
 
-    // 1. Create the organisation
-    const { data: org, error: orgErr } = await admin
+    // 1. Create the organisation using the caller's own JWT (platform admin RLS allows this)
+    const { data: org, error: orgErr } = await callerClient
       .from('organisations')
       .insert({
         name: firm_name,
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
 
     if (orgErr) return error(orgErr.message, 500)
 
-    // 2. Invite the admin user (creates auth.users row + sends magic link email)
+    // 2. Invite the admin user (requires service role — creates auth.users row + sends magic link)
     const { data: invited, error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
       admin_email,
       {
