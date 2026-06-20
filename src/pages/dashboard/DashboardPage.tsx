@@ -49,7 +49,7 @@ export default function DashboardPage() {
   // ── Queries ──────────────────────────────────────────────────────────────────
 
   const { data: org } = useQuery<{ created_at: string }>({
-    queryKey: ['org', orgId],
+    queryKey: ['org_dashboard', orgId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organisations')

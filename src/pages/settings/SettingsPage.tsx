@@ -75,7 +75,7 @@ export default function SettingsPage() {
   // ── Queries ────────────────────────────────────────────────────────────────
 
   const { data: org } = useQuery<{ name: string; currency: string; created_at: string }>({
-    queryKey: ['org', orgId],
+    queryKey: ['org_settings', orgId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organisations')
@@ -141,7 +141,7 @@ export default function SettingsPage() {
       .eq('id', orgId!)
     setCurrencySaving(false)
     if (error) { setCurrencyError(error.message); return }
-    queryClient.invalidateQueries({ queryKey: ['org', orgId] })
+    queryClient.invalidateQueries({ queryKey: ['org_settings', orgId] })
     setCurrencySaved(true)
     setTimeout(() => setCurrencySaved(false), 3000)
   }
