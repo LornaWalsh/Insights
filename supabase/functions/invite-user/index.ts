@@ -82,6 +82,8 @@ Deno.serve(async (req) => {
         role: 'admin',
         organisation_id: org.id,
         full_name: billing_contact_name ?? admin_email,
+        email: admin_email,
+        invited_at: new Date().toISOString(),
       })
       .eq('id', invited.user.id)
 

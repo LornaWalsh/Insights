@@ -14,8 +14,11 @@ export interface Profile {
   organisation_id: string | null
   role: UserRole
   full_name: string
+  email: string | null
   channel_id: string | null
   is_platform_admin: boolean
+  invited_at: string | null
+  last_sign_in_at: string | null
   created_at: string
 }
 

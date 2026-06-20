@@ -3,6 +3,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { Building2, Plus, X, Pencil, Trash2 } from 'lucide-react'
 
+interface AdminProfile {
+  email: string | null
+  invited_at: string | null
+  last_sign_in_at: string | null
+}
+
 interface OrgRow {
   id: string
   name: string
@@ -13,18 +19,36 @@ interface OrgRow {
   channel_count: number | null
   channel_description: string | null
   created_at: string
+  admin?: AdminProfile
+}
+
+function inviteStatus(admin?: AdminProfile) {
+  if (!admin?.invited_at) return { label: 'No invite sent', colour: 'text-muted-foreground' }
+  if (!admin.last_sign_in_at) return { label: 'Invite pending', colour: 'text-amber-600' }
+  const date = new Date(admin.last_sign_in_at).toLocaleDateString('en-GB')
+  return { label: `Active — last seen ${date}`, colour: 'text-green-600' }
 }
 
 function useOrganisations() {
   return useQuery({
     queryKey: ['platform-orgs'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: orgs, error } = await supabase
         .from('organisations')
         .select('id, name, phone, billing_contact_name, billing_contact_email, description, channel_count, channel_description, created_at')
         .order('created_at', { ascending: false })
       if (error) throw error
-      return data as OrgRow[]
+
+      // Fetch admin profile for each org
+      const { data: admins } = await supabase
+        .from('profiles')
+        .select('organisation_id, email, invited_at, last_sign_in_at')
+        .eq('role', 'admin')
+
+      return (orgs as OrgRow[]).map(org => ({
+        ...org,
+        admin: admins?.find(a => a.organisation_id === org.id) as AdminProfile | undefined,
+      }))
     },
   })
 }
@@ -278,29 +302,34 @@ export default function PlatformAdminPage() {
               <thead>
                 <tr className="border-b bg-muted/50">
                   <th className="text-left px-5 py-2.5 font-medium text-muted-foreground">Firm name</th>
-                  <th className="text-left px-5 py-2.5 font-medium text-muted-foreground">Phone</th>
+                  <th className="text-left px-5 py-2.5 font-medium text-muted-foreground">Admin email</th>
+                  <th className="text-left px-5 py-2.5 font-medium text-muted-foreground">Status</th>
                   <th className="text-left px-5 py-2.5 font-medium text-muted-foreground">Created</th>
                   <th className="px-5 py-2.5" />
                 </tr>
               </thead>
               <tbody>
-                {orgs?.map(org => (
-                  <tr key={org.id} className="border-b last:border-0 hover:bg-muted/30">
-                    <td className="px-5 py-3 font-medium text-foreground">{org.name}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{org.phone ?? '—'}</td>
-                    <td className="px-5 py-3 text-muted-foreground">{new Date(org.created_at).toLocaleDateString('en-GB')}</td>
-                    <td className="px-5 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => openEdit(org)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title="Edit">
-                          <Pencil size={14} />
-                        </button>
-                        <button onClick={() => openDelete(org)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Delete">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {orgs?.map(org => {
+                  const status = inviteStatus(org.admin)
+                  return (
+                    <tr key={org.id} className="border-b last:border-0 hover:bg-muted/30">
+                      <td className="px-5 py-3 font-medium text-foreground">{org.name}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{org.admin?.email ?? '—'}</td>
+                      <td className={`px-5 py-3 text-sm font-medium ${status.colour}`}>{status.label}</td>
+                      <td className="px-5 py-3 text-muted-foreground">{new Date(org.created_at).toLocaleDateString('en-GB')}</td>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => openEdit(org)} className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors" title="Edit">
+                            <Pencil size={14} />
+                          </button>
+                          <button onClick={() => openDelete(org)} className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Delete">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           )}
