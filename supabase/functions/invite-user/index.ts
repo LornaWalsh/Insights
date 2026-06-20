@@ -75,8 +75,25 @@ Deno.serve(async (req) => {
       return error(inviteErr.message, 500)
     }
 
-    // 3. Wait briefly for handle_new_user trigger to create the profile
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // 3. Wait for handle_new_user trigger to create the profile row, with retries.
+    // The trigger is async — if we call assign_org_admin before the row exists,
+    // the UPDATE silently affects 0 rows and the user keeps role='staff'.
+    let profileExists = false
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      const { data: check } = await adminClient
+        .from('profiles')
+        .select('id')
+        .eq('id', invited.user.id)
+        .maybeSingle()
+      if (check) { profileExists = true; break }
+    }
+
+    if (!profileExists) {
+      await adminClient.auth.admin.deleteUser(invited.user.id)
+      await adminClient.from('organisations').delete().eq('id', org.id)
+      return error('Profile was not created in time. Please try again.', 500)
+    }
 
     // 4. Set role/org/email via security definer function (bypasses RLS reliably)
     const { error: profileErr } = await callerClient.rpc('assign_org_admin', {
@@ -88,7 +105,7 @@ Deno.serve(async (req) => {
 
     if (profileErr) {
       await adminClient.auth.admin.deleteUser(invited.user.id)
-      await callerClient.from('organisations').delete().eq('id', org.id)
+      await adminClient.from('organisations').delete().eq('id', org.id)
       return error(profileErr.message, 500)
     }
 
