@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { callFunction } from '@/lib/callFunction'
 import { Building2, Plus, X, Pencil, Trash2 } from 'lucide-react'
 
 interface AdminProfile {
@@ -63,23 +64,6 @@ const emptyForm = {
   admin_email: '',
 }
 
-async function getToken() {
-  const { data: { session } } = await supabase.auth.getSession()
-  return session?.access_token ?? ''
-}
-
-async function callFunction(name: string, body: object) {
-  const token = await getToken()
-  const res = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${name}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify(body),
-    }
-  )
-  return { ok: res.ok, json: await res.json() }
-}
 
 export default function PlatformAdminPage() {
   const qc = useQueryClient()
