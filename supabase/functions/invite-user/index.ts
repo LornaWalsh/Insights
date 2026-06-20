@@ -78,17 +78,13 @@ Deno.serve(async (req) => {
     // 3. Wait briefly for handle_new_user trigger to create the profile
     await new Promise(resolve => setTimeout(resolve, 1000))
 
-    // 4. Update profile using service role to bypass any RLS timing issues
-    const { error: profileErr } = await adminClient
-      .from('profiles')
-      .update({
-        role: 'admin',
-        organisation_id: org.id,
-        full_name: billing_contact_name ?? admin_email,
-        email: admin_email,
-        invited_at: new Date().toISOString(),
-      })
-      .eq('id', invited.user.id)
+    // 4. Set role/org/email via security definer function (bypasses RLS reliably)
+    const { error: profileErr } = await callerClient.rpc('assign_org_admin', {
+      p_user_id: invited.user.id,
+      p_org_id: org.id,
+      p_full_name: billing_contact_name ?? admin_email,
+      p_email: admin_email,
+    })
 
     if (profileErr) {
       await adminClient.auth.admin.deleteUser(invited.user.id)
