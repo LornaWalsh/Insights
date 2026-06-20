@@ -43,6 +43,9 @@ Deno.serve(async (req) => {
 
     if (!firm_name || !admin_email) return error('firm_name and admin_email are required', 400)
 
+    const adminClient = createClient(supabaseUrl, serviceKey)
+    const fullName = billing_contact_name || admin_email
+
     // 1. Create org using caller JWT (platform admin RLS allows insert)
     const { data: org, error: orgErr } = await callerClient
       .from('organisations')
@@ -61,47 +64,32 @@ Deno.serve(async (req) => {
     if (orgErr) return error(orgErr.message, 500)
 
     // 2. Invite user — requires service role (admin auth API)
-    const adminClient = createClient(supabaseUrl, serviceKey)
     const { data: invited, error: inviteErr } = await adminClient.auth.admin.inviteUserByEmail(
       admin_email,
       {
-        data: { full_name: billing_contact_name ?? admin_email },
+        data: { full_name: fullName },
         redirectTo: `${req.headers.get('origin') ?? 'http://localhost:5174'}/accept-invite`,
       }
     )
 
     if (inviteErr) {
-      await callerClient.from('organisations').delete().eq('id', org.id)
+      await adminClient.from('organisations').delete().eq('id', org.id)
       return error(inviteErr.message, 500)
     }
 
-    // 3. Wait for handle_new_user trigger to create the profile row, with retries.
-    // The trigger is async — if we call assign_org_admin before the row exists,
-    // the UPDATE silently affects 0 rows and the user keeps role='staff'.
-    let profileExists = false
-    for (let attempt = 0; attempt < 8; attempt++) {
-      await new Promise(resolve => setTimeout(resolve, 500))
-      const { data: check } = await adminClient
-        .from('profiles')
-        .select('id')
-        .eq('id', invited.user.id)
-        .maybeSingle()
-      if (check) { profileExists = true; break }
-    }
-
-    if (!profileExists) {
-      await adminClient.auth.admin.deleteUser(invited.user.id)
-      await adminClient.from('organisations').delete().eq('id', org.id)
-      return error('Profile was not created in time. Please try again.', 500)
-    }
-
-    // 4. Set role/org/email via security definer function (bypasses RLS reliably)
-    const { error: profileErr } = await callerClient.rpc('assign_org_admin', {
-      p_user_id: invited.user.id,
-      p_org_id: org.id,
-      p_full_name: billing_contact_name ?? admin_email,
-      p_email: admin_email,
-    })
+    // 3. Create or update the profile directly via service role — do not rely on
+    //    the handle_new_user trigger which may not exist or may be slow.
+    const { error: profileErr } = await adminClient
+      .from('profiles')
+      .upsert({
+        id: invited.user.id,
+        organisation_id: org.id,
+        role: 'admin',
+        full_name: fullName,
+        email: admin_email,
+        invited_at: new Date().toISOString(),
+        is_platform_admin: false,
+      }, { onConflict: 'id' })
 
     if (profileErr) {
       await adminClient.auth.admin.deleteUser(invited.user.id)
