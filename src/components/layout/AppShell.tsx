@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/lib/supabase'
 import {
   LayoutDashboard, PenLine, BarChart2, TrendingUp,
   Upload, Users, Settings, LogOut, Menu, X, ChevronRight
@@ -40,6 +42,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const { data: org } = useQuery({
+    queryKey: ['org', profile?.organisation_id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('organisations')
+        .select('name')
+        .eq('id', profile!.organisation_id!)
+        .single()
+      return data
+    },
+    enabled: !!profile?.organisation_id,
+  })
+
   if (!profile) return <>{children}</>
 
   const role = profile.role
@@ -62,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Brand */}
       <div className="px-6 py-5 border-b">
         <span className="text-lg font-bold text-foreground">Insight Hub</span>
-        <p className="text-xs text-muted-foreground mt-0.5 truncate">{profile.full_name}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 truncate">{org?.name ?? '…'}</p>
       </div>
 
       {/* Nav */}
@@ -96,15 +111,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         })}
       </nav>
 
-      {/* Sign out */}
-      <div className="px-3 py-4 border-t">
+      {/* Footer */}
+      <div className="px-3 py-4 border-t space-y-1">
         <button
           onClick={handleSignOut}
           className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted w-full transition-colors"
         >
           <LogOut size={18} />
-          Sign out
+          Log out
         </button>
+        <p className="text-xs text-muted-foreground px-3 pt-1">Insight Hub · by LW</p>
       </div>
     </div>
   )
