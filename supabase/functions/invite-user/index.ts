@@ -75,8 +75,11 @@ Deno.serve(async (req) => {
       return error(inviteErr.message, 500)
     }
 
-    // 3. Update profile using caller JWT (platform admin can update any profile via RLS)
-    const { error: profileErr } = await callerClient
+    // 3. Wait briefly for handle_new_user trigger to create the profile
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // 4. Update profile using service role to bypass any RLS timing issues
+    const { error: profileErr } = await adminClient
       .from('profiles')
       .update({
         role: 'admin',
@@ -88,7 +91,6 @@ Deno.serve(async (req) => {
       .eq('id', invited.user.id)
 
     if (profileErr) {
-      // Roll back — delete auth user and org
       await adminClient.auth.admin.deleteUser(invited.user.id)
       await callerClient.from('organisations').delete().eq('id', org.id)
       return error(profileErr.message, 500)
