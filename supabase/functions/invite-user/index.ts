@@ -11,7 +11,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify caller is platform admin
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) return error('Unauthorized', 401)
 
@@ -19,10 +18,12 @@ Deno.serve(async (req) => {
     const serviceKey  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const anonKey     = Deno.env.get('SUPABASE_ANON_KEY')!
 
-    // Verify caller's JWT
+    // Caller client — uses platform admin's JWT, respects RLS
     const callerClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     })
+
+    // Verify caller is platform admin
     const { data: { user: caller } } = await callerClient.auth.getUser()
     if (!caller) return error('Unauthorized', 401)
 
@@ -34,7 +35,6 @@ Deno.serve(async (req) => {
 
     if (!callerProfile?.is_platform_admin) return error('Forbidden', 403)
 
-    // Parse request body
     const body = await req.json()
     const {
       firm_name, description, channel_count, channel_description,
@@ -43,28 +43,26 @@ Deno.serve(async (req) => {
 
     if (!firm_name || !admin_email) return error('firm_name and admin_email are required', 400)
 
-    // Service role client — only needed for auth.admin operations
-    const admin = createClient(supabaseUrl, serviceKey)
-
-    // 1. Create the organisation using the caller's own JWT (platform admin RLS allows this)
+    // 1. Create org using caller JWT (platform admin RLS allows insert)
     const { data: org, error: orgErr } = await callerClient
       .from('organisations')
       .insert({
         name: firm_name,
-        description,
-        channel_count,
-        channel_description,
-        phone,
-        billing_contact_name,
-        billing_contact_email,
+        description: description || null,
+        channel_count: channel_count || null,
+        channel_description: channel_description || null,
+        phone: phone || null,
+        billing_contact_name: billing_contact_name || null,
+        billing_contact_email: billing_contact_email || null,
       })
       .select()
       .single()
 
     if (orgErr) return error(orgErr.message, 500)
 
-    // 2. Invite the admin user (requires service role — creates auth.users row + sends magic link)
-    const { data: invited, error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
+    // 2. Invite user — requires service role (admin auth API)
+    const adminClient = createClient(supabaseUrl, serviceKey)
+    const { data: invited, error: inviteErr } = await adminClient.auth.admin.inviteUserByEmail(
       admin_email,
       {
         data: { full_name: billing_contact_name ?? admin_email },
@@ -73,14 +71,12 @@ Deno.serve(async (req) => {
     )
 
     if (inviteErr) {
-      // Roll back org creation
-      await admin.from('organisations').delete().eq('id', org.id)
+      await callerClient.from('organisations').delete().eq('id', org.id)
       return error(inviteErr.message, 500)
     }
 
-    // 3. Update the profile created by handle_new_user trigger
-    //    Set role=admin, organisation_id, full_name
-    const { error: profileErr } = await admin
+    // 3. Update profile using caller JWT (platform admin can update any profile via RLS)
+    const { error: profileErr } = await callerClient
       .from('profiles')
       .update({
         role: 'admin',
@@ -89,7 +85,12 @@ Deno.serve(async (req) => {
       })
       .eq('id', invited.user.id)
 
-    if (profileErr) return error(profileErr.message, 500)
+    if (profileErr) {
+      // Roll back — delete auth user and org
+      await adminClient.auth.admin.deleteUser(invited.user.id)
+      await callerClient.from('organisations').delete().eq('id', org.id)
+      return error(profileErr.message, 500)
+    }
 
     return new Response(
       JSON.stringify({ success: true, organisation_id: org.id }),
