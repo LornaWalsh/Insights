@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       admin_email,
       {
         data: { full_name: billing_contact_name ?? admin_email },
-        redirectTo: `${req.headers.get('origin') ?? 'http://localhost:5174'}/onboarding`,
+        redirectTo: `${req.headers.get('origin') ?? 'http://localhost:5174'}/accept-invite`,
       }
     )
 

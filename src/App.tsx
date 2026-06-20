@@ -4,6 +4,7 @@ import { AuthProvider } from '@/hooks/useAuth'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import { AppShell } from '@/components/layout/AppShell'
 import LoginPage from '@/pages/auth/LoginPage'
+import AcceptInvitePage from '@/pages/auth/AcceptInvitePage'
 import OnboardingPage from '@/pages/onboarding/OnboardingPage'
 import PlatformAdminPage from '@/pages/platform/PlatformAdminPage'
 
@@ -51,6 +52,7 @@ export default function App() {
           <Routes>
             {/* Public */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/accept-invite" element={<AcceptInvitePage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
             {/* Onboarding — admin only, no AppShell */}
