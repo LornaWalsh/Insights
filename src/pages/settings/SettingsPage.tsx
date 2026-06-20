@@ -61,6 +61,7 @@ export default function SettingsPage() {
   const [nameSaved, setNameSaved] = useState(false)
 
   // Password change state
+  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [savingPassword, setSavingPassword] = useState(false)
@@ -180,12 +181,26 @@ export default function SettingsPage() {
 
   async function savePassword() {
     setPasswordError('')
-    if (newPassword.length < 8) { setPasswordError('Password must be at least 8 characters.'); return }
+    if (!currentPassword) { setPasswordError('Enter your current password.'); return }
+    if (newPassword.length < 8) { setPasswordError('New password must be at least 8 characters.'); return }
     if (newPassword !== confirmPassword) { setPasswordError('Passwords do not match.'); return }
+    if (newPassword === currentPassword) { setPasswordError('New password must be different from your current password.'); return }
+
     setSavingPassword(true)
+
+    // Verify current password by re-authenticating
+    const email = profile?.email ?? ''
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password: currentPassword })
+    if (signInErr) {
+      setPasswordError('Current password is incorrect.')
+      setSavingPassword(false)
+      return
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword })
     setSavingPassword(false)
     if (error) { setPasswordError(error.message); return }
+    setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
     setPasswordSaved(true)
@@ -349,6 +364,16 @@ export default function SettingsPage() {
         <div className="space-y-3 pt-2 border-t">
           <p className="text-sm font-medium text-foreground pt-2">Change password</p>
           <div className="space-y-1">
+            <label className="text-sm text-muted-foreground">Current password</label>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={e => { setCurrentPassword(e.target.value); setPasswordSaved(false) }}
+              placeholder="Your current password"
+              className="w-full px-3 py-2 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div className="space-y-1">
             <label className="text-sm text-muted-foreground">New password</label>
             <input
               type="password"
@@ -359,7 +384,7 @@ export default function SettingsPage() {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm text-muted-foreground">Confirm password</label>
+            <label className="text-sm text-muted-foreground">Confirm new password</label>
             <input
               type="password"
               value={confirmPassword}
@@ -373,7 +398,7 @@ export default function SettingsPage() {
           <div className="flex justify-end">
             <button
               onClick={savePassword}
-              disabled={savingPassword || !newPassword || !confirmPassword}
+              disabled={savingPassword || !currentPassword || !newPassword || !confirmPassword}
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
               {savingPassword ? 'Saving…' : 'Update password'}
