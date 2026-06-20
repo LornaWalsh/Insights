@@ -50,12 +50,16 @@ export function StepForecasts({ channels, onDone, onSkip }: Props) {
   }
 
   async function handleSave() {
+    if (!profile?.organisation_id) {
+      setError('Your account is not linked to an organisation. Please contact support.')
+      return
+    }
     setSaving(true)
     setError('')
 
     const rows = channels.flatMap(ch =>
       grid[ch.id].map((target_revenue, i) => ({
-        organisation_id: profile!.organisation_id,
+        organisation_id: profile.organisation_id,
         channel_id: ch.id,
         year,
         month: i + 1,
@@ -74,7 +78,7 @@ export function StepForecasts({ channels, onDone, onSkip }: Props) {
     onDone()
   }
 
-  const currency = profile ? 'GBP' : 'GBP'
+  const currency = 'GBP'
 
   return (
     <div className="space-y-6">

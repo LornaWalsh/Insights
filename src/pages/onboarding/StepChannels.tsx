@@ -44,6 +44,8 @@ export function StepChannels({ onDone }: Props) {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  const orgId = profile?.organisation_id
+
   function toggleDay(day: number) {
     setDraft(d => ({
       ...d,
@@ -67,7 +69,16 @@ export function StepChannels({ onDone }: Props) {
     setDraft(d => ({ ...d, closed_dates: d.closed_dates.filter(x => x !== date) }))
   }
 
+  async function saveClosedDates(channelId: string, dates: string[]) {
+    if (dates.length === 0) return
+    const { error: err } = await supabase.from('channel_closed_dates').insert(
+      dates.map(d => ({ channel_id: channelId, organisation_id: orgId, closed_date: d }))
+    )
+    if (err) setError(`Channel saved but closed dates could not be saved: ${err.message}`)
+  }
+
   async function addChannel() {
+    if (!orgId) { setError('Your account is not linked to an organisation. Please contact support.'); return }
     if (!draft.name.trim()) { setError('Channel name is required.'); return }
     if (draft.trading_days.length === 0) { setError('Select at least one trading day.'); return }
     setError('')
@@ -76,7 +87,7 @@ export function StepChannels({ onDone }: Props) {
     const { data, error: err } = await supabase
       .from('sales_channels')
       .insert({
-        organisation_id: profile!.organisation_id,
+        organisation_id: orgId,
         name: draft.name.trim(),
         channel_type: draft.channel_type,
         trading_days: draft.trading_days,
@@ -90,36 +101,33 @@ export function StepChannels({ onDone }: Props) {
       return
     }
 
-    // Save closed dates if any
-    if (draft.closed_dates.length > 0) {
-      await supabase.from('channel_closed_dates').insert(
-        draft.closed_dates.map(d => ({
-          channel_id: data.id,
-          organisation_id: profile!.organisation_id,
-          closed_date: d,
-        }))
-      )
-    }
-
+    await saveClosedDates(data.id, draft.closed_dates)
     setSaved(prev => [...prev, data as SalesChannel])
     setDraft(emptyDraft())
     setSaving(false)
   }
 
-  function removeChannel(id: string) {
-    supabase.from('sales_channels').delete().eq('id', id)
+  async function removeChannel(id: string) {
+    const { error: err } = await supabase.from('sales_channels').delete().eq('id', id)
+    if (err) {
+      setError('Failed to remove channel. Please try again.')
+      return
+    }
     setSaved(prev => prev.filter(c => c.id !== id))
   }
 
   async function handleNext() {
+    if (!orgId) { setError('Your account is not linked to an organisation. Please contact support.'); return }
+
     // Auto-save the current draft if a name has been entered but not yet added
     if (draft.name.trim()) {
       if (draft.trading_days.length === 0) { setError('Select at least one trading day for the current channel.'); return }
       setSubmitting(true)
+
       const { data, error: err } = await supabase
         .from('sales_channels')
         .insert({
-          organisation_id: profile!.organisation_id,
+          organisation_id: orgId,
           name: draft.name.trim(),
           channel_type: draft.channel_type,
           trading_days: draft.trading_days,
@@ -133,16 +141,7 @@ export function StepChannels({ onDone }: Props) {
         return
       }
 
-      if (draft.closed_dates.length > 0) {
-        await supabase.from('channel_closed_dates').insert(
-          draft.closed_dates.map(d => ({
-            channel_id: data.id,
-            organisation_id: profile!.organisation_id,
-            closed_date: d,
-          }))
-        )
-      }
-
+      await saveClosedDates(data.id, draft.closed_dates)
       onDone([...saved, data as SalesChannel])
       return
     }
@@ -280,7 +279,8 @@ export function StepChannels({ onDone }: Props) {
       <div className="flex justify-end">
         <button
           onClick={handleNext}
-          disabled={submitting || saved.length === 0}
+          disabled={submitting || (saved.length === 0 && !draft.name.trim())}
+          title={saved.length === 0 && !draft.name.trim() ? 'Add at least one channel to continue' : undefined}
           className="flex items-center gap-2 px-5 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           Next: Forecast targets
