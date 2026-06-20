@@ -112,6 +112,41 @@ export function StepChannels({ onDone }: Props) {
   }
 
   async function handleNext() {
+    // Auto-save the current draft if a name has been entered but not yet added
+    if (draft.name.trim()) {
+      if (draft.trading_days.length === 0) { setError('Select at least one trading day for the current channel.'); return }
+      setSubmitting(true)
+      const { data, error: err } = await supabase
+        .from('sales_channels')
+        .insert({
+          organisation_id: profile!.organisation_id,
+          name: draft.name.trim(),
+          channel_type: draft.channel_type,
+          trading_days: draft.trading_days,
+        })
+        .select()
+        .single()
+
+      if (err || !data) {
+        setError(err?.message ?? 'Failed to save channel.')
+        setSubmitting(false)
+        return
+      }
+
+      if (draft.closed_dates.length > 0) {
+        await supabase.from('channel_closed_dates').insert(
+          draft.closed_dates.map(d => ({
+            channel_id: data.id,
+            organisation_id: profile!.organisation_id,
+            closed_date: d,
+          }))
+        )
+      }
+
+      onDone([...saved, data as SalesChannel])
+      return
+    }
+
     if (saved.length === 0) { setError('Add at least one channel before continuing.'); return }
     setSubmitting(true)
     onDone(saved)
