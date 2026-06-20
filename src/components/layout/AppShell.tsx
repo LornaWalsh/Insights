@@ -120,7 +120,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <LogOut size={18} />
           Log out
         </button>
-        <p className="text-xs text-muted-foreground px-3 pt-1">Insight Hub · by LW</p>
+        <a
+          href="https://livingstonewalsh.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-muted-foreground px-3 pt-1 hover:text-foreground transition-colors"
+        >
+          Insight Hub · by LW
+        </a>
       </div>
     </div>
   )
