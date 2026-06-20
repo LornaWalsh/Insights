@@ -8,6 +8,7 @@ import AcceptInvitePage from '@/pages/auth/AcceptInvitePage'
 import OnboardingPage from '@/pages/onboarding/OnboardingPage'
 import PlatformAdminPage from '@/pages/platform/PlatformAdminPage'
 import DashboardPage from '@/pages/dashboard/DashboardPage'
+import DailyInputPage from '@/pages/daily-input/DailyInputPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -74,7 +75,7 @@ export default function App() {
             <Route path="/settings"  element={<Protected roles={['admin']}><ComingSoon title="Settings" /></Protected>} />
 
             {/* All authenticated users */}
-            <Route path="/daily-input" element={<Protected roles={['admin', 'manager', 'staff']}><ComingSoon title="Daily Input" /></Protected>} />
+            <Route path="/daily-input" element={<Protected roles={['admin', 'manager', 'staff']}><DailyInputPage /></Protected>} />
 
             {/* Platform admin — no AppShell, its own minimal UI */}
             <Route path="/platform" element={
