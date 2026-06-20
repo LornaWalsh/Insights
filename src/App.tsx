@@ -11,6 +11,7 @@ import DashboardPage from '@/pages/dashboard/DashboardPage'
 import DailyInputPage from '@/pages/daily-input/DailyInputPage'
 import SettingsPage from '@/pages/settings/SettingsPage'
 import UsersPage from '@/pages/users/UsersPage'
+import ImportPage from '@/pages/import/ImportPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,7 +73,7 @@ export default function App() {
 
             {/* Admin only */}
             <Route path="/forecasts" element={<Protected roles={['admin']}><ComingSoon title="Forecasts" /></Protected>} />
-            <Route path="/import"    element={<Protected roles={['admin']}><ComingSoon title="Import" /></Protected>} />
+            <Route path="/import"    element={<Protected roles={['admin']}><ImportPage /></Protected>} />
             <Route path="/users"     element={<Protected roles={['admin']}><UsersPage /></Protected>} />
             <Route path="/settings"  element={<Protected roles={['admin']}><SettingsPage /></Protected>} />
 
