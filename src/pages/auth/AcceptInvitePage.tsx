@@ -54,8 +54,19 @@ export default function AcceptInvitePage() {
       return
     }
 
-    // Password set — head to onboarding
-    navigate('/onboarding', { replace: true })
+    // Fetch profile to determine where to send the user
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', (await supabase.auth.getUser()).data.user!.id)
+      .single()
+
+    // Admins go through the onboarding wizard; all other roles go straight to daily input
+    if (profile?.role === 'admin') {
+      navigate('/onboarding', { replace: true })
+    } else {
+      navigate('/daily-input', { replace: true })
+    }
   }
 
   if (!sessionReady) {
