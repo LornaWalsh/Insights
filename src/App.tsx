@@ -7,6 +7,7 @@ import LoginPage from '@/pages/auth/LoginPage'
 import AcceptInvitePage from '@/pages/auth/AcceptInvitePage'
 import OnboardingPage from '@/pages/onboarding/OnboardingPage'
 import PlatformAdminPage from '@/pages/platform/PlatformAdminPage'
+import DashboardPage from '@/pages/dashboard/DashboardPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,7 +64,7 @@ export default function App() {
             } />
 
             {/* Admin + Manager */}
-            <Route path="/dashboard" element={<Protected roles={['admin', 'manager']}><ComingSoon title="Dashboard" /></Protected>} />
+            <Route path="/dashboard" element={<Protected roles={['admin', 'manager']}><DashboardPage /></Protected>} />
             <Route path="/reports"   element={<Protected roles={['admin', 'manager']}><ComingSoon title="Reports" /></Protected>} />
 
             {/* Admin only */}
