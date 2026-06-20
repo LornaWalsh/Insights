@@ -23,8 +23,7 @@ interface OrgRow {
 }
 
 function inviteStatus(admin?: AdminProfile) {
-  if (!admin?.invited_at) return { label: 'No invite sent', colour: 'text-muted-foreground' }
-  if (!admin.last_sign_in_at) return { label: 'Invite pending', colour: 'text-amber-600' }
+  if (!admin?.last_sign_in_at) return { label: 'Invite pending', colour: 'text-amber-600' }
   const date = new Date(admin.last_sign_in_at).toLocaleDateString('en-GB')
   return { label: `Active — last seen ${date}`, colour: 'text-green-600' }
 }
