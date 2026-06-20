@@ -48,6 +48,25 @@ export default function DashboardPage() {
 
   // ── Queries ──────────────────────────────────────────────────────────────────
 
+  const { data: org } = useQuery<{ created_at: string }>({
+    queryKey: ['org', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organisations')
+        .select('created_at')
+        .eq('id', orgId!)
+        .single()
+      if (error) throw error
+      return data
+    },
+    enabled: !!orgId,
+  })
+
+  // Data start date — missing days are only flagged from this date onwards.
+  // Uses org created_at date so clients who sign up mid-month aren't alerted
+  // about days before they joined.
+  const dataStartDate = org ? org.created_at.split('T')[0] : todayStr
+
   const { data: channels = [] } = useQuery<SalesChannel[]>({
     queryKey: ['channels', orgId],
     queryFn: async () => {
@@ -114,10 +133,10 @@ export default function DashboardPage() {
   // ── Computation ──────────────────────────────────────────────────────────────
 
   const dashData = useMemo(() => {
-    if (!channels.length) return null
+    if (!channels.length || !org) return null
     return computeDashboard(
       year, month, channels, closedDates,
-      performance, targets, selectedChannelId, todayStr
+      performance, targets, selectedChannelId, todayStr, dataStartDate
     )
   }, [year, month, channels, closedDates, performance, targets, selectedChannelId, todayStr])
 

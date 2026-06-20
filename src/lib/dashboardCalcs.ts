@@ -107,7 +107,8 @@ export function computeDashboard(
   performance: DailyPerformance[],  // all rows for this month (all channels)
   targets: ForecastTarget[],        // all rows for this year/month (all channels)
   selectedChannelId: string | null, // null = all channels
-  todayStr: string                  // YYYY-MM-DD
+  todayStr: string,                 // YYYY-MM-DD
+  dataStartDate: string             // YYYY-MM-DD — org created_at date, missing days not flagged before this
 ): DashboardData {
   const allDays = getDaysInMonth(year, month)
   const todayIdx = allDays.indexOf(todayStr)
@@ -228,6 +229,7 @@ export function computeDashboard(
   for (const ch of activeChannels) {
     for (const dateStr of elapsedDays) {
       if (dateStr >= todayStr) continue // don't flag today
+      if (dateStr < dataStartDate) continue // don't flag days before org was created
       if (!isTradingDay(dateStr, ch, closedDates)) continue
       if (perfMap[`${ch.id}|${dateStr}`] === undefined) {
         missingDays.push({ channelId: ch.id, channelName: ch.name, date: dateStr })
