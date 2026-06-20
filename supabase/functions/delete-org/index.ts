@@ -45,15 +45,21 @@ Deno.serve(async (req) => {
       .select('id')
       .eq('organisation_id', organisation_id)
 
-    // 2. Delete each auth user
+    // 2. Delete auth users via service role (removes their profiles via FK cascade)
     if (profiles && profiles.length > 0) {
       for (const profile of profiles) {
         await adminClient.auth.admin.deleteUser(profile.id)
       }
     }
 
-    // 3. Delete the org (cascades to channels, daily_performance, etc.)
-    const { error: deleteErr } = await callerClient
+    // 3. Delete any remaining profiles explicitly (in case auth delete didn't cascade in time)
+    await adminClient
+      .from('profiles')
+      .delete()
+      .eq('organisation_id', organisation_id)
+
+    // 4. Delete the org (cascades to channels, daily_performance, etc. — no profiles left)
+    const { error: deleteErr } = await adminClient
       .from('organisations')
       .delete()
       .eq('id', organisation_id)
