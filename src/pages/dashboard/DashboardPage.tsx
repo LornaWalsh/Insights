@@ -48,12 +48,12 @@ export default function DashboardPage() {
 
   // ── Queries ──────────────────────────────────────────────────────────────────
 
-  const { data: org } = useQuery<{ created_at: string }>({
+  const { data: org } = useQuery<{ created_at: string; currency: string }>({
     queryKey: ['org_dashboard', orgId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organisations')
-        .select('created_at')
+        .select('created_at, currency')
         .eq('id', orgId!)
         .single()
       if (error) throw error
@@ -140,8 +140,7 @@ export default function DashboardPage() {
     )
   }, [year, month, channels, closedDates, performance, targets, selectedChannelId, todayStr])
 
-  // Currency comes from org settings — default GBP until Settings page is built
-  const currency = 'GBP'
+  const currency = org?.currency ?? 'GBP'
 
   // ── Progress bar labels ───────────────────────────────────────────────────────
   const daysInMonth = allDays.length

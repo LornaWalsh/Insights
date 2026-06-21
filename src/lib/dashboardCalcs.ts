@@ -55,6 +55,7 @@ function dailyForecastForChannel(
 
 export interface ChartPoint {
   day: number           // 1–31
+  date: string          // YYYY-MM-DD — used for tooltip and axis labels
   forecast: number      // cumulative forecast to this day
   actual: number | null // cumulative actual (null = gap — no data entered)
   requiredPace: number | null // straight line from today's actual to monthly target
@@ -163,12 +164,13 @@ export function computeDashboard(
       if (dayActual !== null) cumulativeActual += dayActual
       chartData.push({
         day: dayNum,
+        date: dateStr,
         forecast: cumulativeForecast,
         actual: dayActual !== null ? cumulativeActual : null,
         requiredPace: null,
       })
     } else {
-      chartData.push({ day: dayNum, forecast: cumulativeForecast, actual: null, requiredPace: null })
+      chartData.push({ day: dayNum, date: dateStr, forecast: cumulativeForecast, actual: null, requiredPace: null })
     }
   }
 

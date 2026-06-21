@@ -54,7 +54,7 @@ export function KpiCards({ data, currency }: Props) {
         value={formatCurrency(monthlyTarget, currency)}
       />
       <KpiCard
-        label="Variance (£)"
+        label="Variance"
         value={formatCurrency(varianceValue, currency)}
         highlight={varianceHighlight}
       />

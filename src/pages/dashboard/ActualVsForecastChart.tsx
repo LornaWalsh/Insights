@@ -14,7 +14,22 @@ function formatY(value: number) {
   return `£${value.toFixed(0)}`
 }
 
+function formatAxisDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00')
+  return d.getDate().toString() // just the day number — clean on a month view
+}
+
+function formatTooltipDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00')
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
 export function ActualVsForecastChart({ data, currency: _currency }: Props) {
+  // Show a tick every 5 days to avoid crowding
+  const tickDates = data
+    .filter(p => p.day === 1 || p.day % 5 === 0)
+    .map(p => p.date)
+
   return (
     <div className="bg-card border rounded-lg p-4">
       <p className="text-sm font-semibold text-foreground mb-4">Actual vs Forecast</p>
@@ -22,7 +37,9 @@ export function ActualVsForecastChart({ data, currency: _currency }: Props) {
         <LineChart data={data} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
           <XAxis
-            dataKey="day"
+            dataKey="date"
+            ticks={tickDates}
+            tickFormatter={formatAxisDate}
             tick={{ fontSize: 11 }}
             tickLine={false}
             axisLine={false}
@@ -39,7 +56,7 @@ export function ActualVsForecastChart({ data, currency: _currency }: Props) {
               `£${value.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
               name,
             ]}
-            labelFormatter={(day: number) => `Day ${day}`}
+            labelFormatter={(date: string) => formatTooltipDate(date)}
             contentStyle={{
               fontSize: 12,
               borderRadius: 6,
