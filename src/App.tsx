@@ -13,6 +13,7 @@ import SettingsPage from '@/pages/settings/SettingsPage'
 import UsersPage from '@/pages/users/UsersPage'
 import ImportPage from '@/pages/import/ImportPage'
 import ForecastsPage from '@/pages/forecasts/ForecastsPage'
+import ReportsPage from '@/pages/reports/ReportsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,7 +71,7 @@ export default function App() {
 
             {/* Admin + Manager */}
             <Route path="/dashboard" element={<Protected roles={['admin', 'manager']}><DashboardPage /></Protected>} />
-            <Route path="/reports"   element={<Protected roles={['admin', 'manager']}><ComingSoon title="Reports" /></Protected>} />
+            <Route path="/reports"   element={<Protected roles={['admin', 'manager']}><ReportsPage /></Protected>} />
 
             {/* Admin only */}
             <Route path="/forecasts" element={<Protected roles={['admin']}><ForecastsPage /></Protected>} />
