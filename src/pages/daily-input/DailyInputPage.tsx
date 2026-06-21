@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { today, formatCurrency } from '@/lib/utils'
@@ -13,10 +14,14 @@ export default function DailyInputPage() {
   const isStaff = profile?.role === 'staff'
   const canEdit = profile?.role === 'admin' || profile?.role === 'manager'
   const todayStr = today()
+  const [searchParams] = useSearchParams()
 
-  const [selectedDate, setSelectedDate] = useState(todayStr)
+  const urlDate = searchParams.get('date')
+  const urlChannel = searchParams.get('channel')
+
+  const [selectedDate, setSelectedDate] = useState(urlDate ?? todayStr)
   const [selectedChannelId, setSelectedChannelId] = useState<string>(
-    profile?.channel_id ?? ''
+    urlChannel ?? profile?.channel_id ?? ''
   )
 
   // ── Channels ────────────────────────────────────────────────────────────────
@@ -35,12 +40,12 @@ export default function DailyInputPage() {
     enabled: !!orgId,
   })
 
-  // Set default channel once channels load (admin/manager only — staff already have channel_id)
+  // Set default channel once channels load — skip if URL param or profile already set it
   useEffect(() => {
     if (!selectedChannelId && channels.length > 0) {
       setSelectedChannelId(channels[0].id)
     }
-  }, [channels, selectedChannelId])
+  }, [channels]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Existing record for selected date + channel ─────────────────────────────
   const { data: existingRecord = null } = useQuery<DailyPerformance | null>({
