@@ -9,9 +9,13 @@ interface Props {
   currency: string
 }
 
-function formatY(value: number) {
-  if (value >= 1000) return `£${(value / 1000).toFixed(1)}k`
-  return `£${value.toFixed(0)}`
+function getCurrencySymbol(currency: string) {
+  return (0).toLocaleString('en', { style: 'currency', currency, minimumFractionDigits: 0 }).replace(/\d/g, '').trim()
+}
+
+function formatY(value: number, symbol: string) {
+  if (value >= 1000) return `${symbol}${(value / 1000).toFixed(1)}k`
+  return `${symbol}${value.toFixed(0)}`
 }
 
 function formatAxisDate(dateStr: string): string {
@@ -24,7 +28,8 @@ function formatTooltipDate(dateStr: string): string {
   return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 }
 
-export function ActualVsForecastChart({ data, currency: _currency }: Props) {
+export function ActualVsForecastChart({ data, currency }: Props) {
+  const symbol = getCurrencySymbol(currency)
   // Show a tick every 5 days to avoid crowding
   const tickDates = data
     .filter(p => p.day === 1 || p.day % 5 === 0)
@@ -45,7 +50,7 @@ export function ActualVsForecastChart({ data, currency: _currency }: Props) {
             axisLine={false}
           />
           <YAxis
-            tickFormatter={formatY}
+            tickFormatter={(v) => formatY(v, symbol)}
             tick={{ fontSize: 11 }}
             tickLine={false}
             axisLine={false}
