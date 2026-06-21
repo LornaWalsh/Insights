@@ -211,8 +211,8 @@ export default function DashboardPage() {
 
       {!loading && dashData && (
         <>
-          {/* Missing data alert — admin only */}
-          {profile?.role === 'admin' && (
+          {/* Missing data alert — admin and manager */}
+          {(profile?.role === 'admin' || profile?.role === 'manager') && (
             <MissingDataAlert missingDays={dashData.missingDays} />
           )}
 
