@@ -143,6 +143,8 @@ export default function SettingsPage() {
     setCurrencySaving(false)
     if (error) { setCurrencyError(error.message); return }
     queryClient.invalidateQueries({ queryKey: ['org_settings', orgId] })
+    queryClient.invalidateQueries({ queryKey: ['org_dashboard', orgId] })
+    queryClient.invalidateQueries({ queryKey: ['org_forecasts', orgId] })
     setCurrencySaved(true)
     setTimeout(() => setCurrencySaved(false), 3000)
   }
