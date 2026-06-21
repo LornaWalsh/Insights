@@ -26,6 +26,10 @@ export default function OnboardingPage() {
     navigate('/dashboard', { replace: true })
   }
 
+  function handleBackToChannels() {
+    setStep(0)
+  }
+
   return (
     <div className="min-h-screen bg-muted flex flex-col items-center justify-start pt-12 px-4">
       {/* Header */}
@@ -67,6 +71,7 @@ export default function OnboardingPage() {
             channels={channels}
             onDone={handleForecastsDone}
             onSkip={handleSkipForecasts}
+            onBack={handleBackToChannels}
           />
         )}
       </div>

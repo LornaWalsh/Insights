@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import type { SalesChannel, ChannelType } from '@/types'
@@ -45,6 +45,20 @@ export function StepChannels({ onDone }: Props) {
   const [submitting, setSubmitting] = useState(false)
 
   const orgId = profile?.organisation_id
+
+  // Load any channels already saved to DB (handles page refresh and re-entry)
+  useEffect(() => {
+    if (!orgId) return
+    supabase
+      .from('sales_channels')
+      .select('*')
+      .eq('organisation_id', orgId)
+      .eq('is_active', true)
+      .order('name')
+      .then(({ data }) => {
+        if (data && data.length > 0) setSaved(data as SalesChannel[])
+      })
+  }, [orgId])
 
   function toggleDay(day: number) {
     setDraft(d => ({

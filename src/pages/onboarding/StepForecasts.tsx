@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import type { SalesChannel } from '@/types'
@@ -10,6 +11,7 @@ interface Props {
   channels: SalesChannel[]
   onDone: () => void
   onSkip: () => void
+  onBack: () => void
 }
 
 type TargetGrid = Record<string, number[]> // channelId -> [12 monthly values]
@@ -22,12 +24,29 @@ function initGrid(channels: SalesChannel[]): TargetGrid {
   return grid
 }
 
-export function StepForecasts({ channels, onDone, onSkip }: Props) {
+export function StepForecasts({ channels, onDone, onSkip, onBack }: Props) {
   const { profile } = useAuth()
+  const orgId = profile?.organisation_id
   const year = new Date().getFullYear()
   const [grid, setGrid] = useState<TargetGrid>(initGrid(channels))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const { data: org } = useQuery<{ currency: string }>({
+    queryKey: ['org_onboarding', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organisations')
+        .select('currency')
+        .eq('id', orgId!)
+        .single()
+      if (error) throw error
+      return data
+    },
+    enabled: !!orgId,
+  })
+
+  const currency = org?.currency ?? 'GBP'
 
   function setValue(channelId: string, monthIndex: number, raw: string) {
     const val = parseFloat(raw) || 0
@@ -78,8 +97,6 @@ export function StepForecasts({ channels, onDone, onSkip }: Props) {
     onDone()
   }
 
-  const currency = 'GBP'
-
   return (
     <div className="space-y-6">
       <div className="bg-card border rounded-lg p-4 flex items-center justify-between">
@@ -122,8 +139,9 @@ export function StepForecasts({ channels, onDone, onSkip }: Props) {
                   step="0.01"
                   value={grid[ch.id][i] === 0 ? '' : grid[ch.id][i]}
                   onChange={e => setValue(ch.id, i, e.target.value)}
+                  onFocus={e => e.target.select()}
                   placeholder="0"
-                  className="w-full px-2 py-1.5 rounded border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full px-2 py-1.5 rounded border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             ))}
@@ -134,12 +152,20 @@ export function StepForecasts({ channels, onDone, onSkip }: Props) {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <div className="flex items-center justify-between pt-2">
-        <button
-          onClick={onSkip}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Skip for now — I'll set targets later
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onBack}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Back to channels
+          </button>
+          <button
+            onClick={onSkip}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Skip for now
+          </button>
+        </div>
         <button
           onClick={handleSave}
           disabled={saving}
