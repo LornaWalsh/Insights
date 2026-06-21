@@ -20,7 +20,9 @@ function formatY(value: number, symbol: string) {
 
 function formatAxisDate(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00')
-  return d.getDate().toString() // just the day number — clean on a month view
+  const day = d.getDate()
+  const mon = d.toLocaleDateString('en-GB', { month: 'short' })
+  return day === 1 ? `1 ${mon}` : String(day)
 }
 
 function formatTooltipDate(dateStr: string): string {
