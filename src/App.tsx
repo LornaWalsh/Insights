@@ -14,6 +14,8 @@ import UsersPage from '@/pages/users/UsersPage'
 import ImportPage from '@/pages/import/ImportPage'
 import ForecastsPage from '@/pages/forecasts/ForecastsPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
+import TermsPage from '@/pages/legal/TermsPage'
+import PrivacyPage from '@/pages/legal/PrivacyPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +63,8 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/accept-invite" element={<AcceptInvitePage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
 
             {/* Onboarding — admin only, no AppShell */}
             <Route path="/onboarding" element={
