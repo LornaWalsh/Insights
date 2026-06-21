@@ -72,36 +72,36 @@ export function ActualVsForecastChart({ data, currency }: Props) {
           />
           <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
 
-          {/* Forecast — french navy */}
+          {/* Forecast — solid blue */}
           <Line
             type="monotone"
             dataKey="forecast"
             name="Forecast"
-            stroke="#002147"
+            stroke="#3b82f6"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 4 }}
             connectNulls
           />
 
-          {/* Actual — copper */}
+          {/* Actual — solid green, gaps where no data */}
           <Line
             type="monotone"
             dataKey="actual"
             name="Actual"
-            stroke="#B87333"
+            stroke="#22c55e"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 4 }}
             connectNulls={false}
           />
 
-          {/* Required daily pace — dashed slate, future only */}
+          {/* Required daily pace — dashed orange, future only */}
           <Line
             type="monotone"
             dataKey="requiredPace"
             name="Required pace"
-            stroke="#94a3b8"
+            stroke="#f97316"
             strokeWidth={1.5}
             strokeDasharray="5 4"
             dot={false}
