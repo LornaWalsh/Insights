@@ -60,7 +60,7 @@ export function ActualVsForecastChart({ data, currency }: Props) {
           />
           <Tooltip
             formatter={(value: number, name: string) => [
-              `£${value.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+              `${symbol}${value.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
               name,
             ]}
             labelFormatter={(date: string) => formatTooltipDate(date)}
@@ -72,36 +72,36 @@ export function ActualVsForecastChart({ data, currency }: Props) {
           />
           <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
 
-          {/* Forecast — solid blue */}
+          {/* Forecast — french navy */}
           <Line
             type="monotone"
             dataKey="forecast"
             name="Forecast"
-            stroke="#3b82f6"
+            stroke="#002147"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 4 }}
             connectNulls
           />
 
-          {/* Actual — solid green, gaps where no data */}
+          {/* Actual — copper */}
           <Line
             type="monotone"
             dataKey="actual"
             name="Actual"
-            stroke="#22c55e"
+            stroke="#B87333"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 4 }}
             connectNulls={false}
           />
 
-          {/* Required daily pace — dashed orange, future only */}
+          {/* Required daily pace — dashed slate, future only */}
           <Line
             type="monotone"
             dataKey="requiredPace"
             name="Required pace"
-            stroke="#f97316"
+            stroke="#94a3b8"
             strokeWidth={1.5}
             strokeDasharray="5 4"
             dot={false}

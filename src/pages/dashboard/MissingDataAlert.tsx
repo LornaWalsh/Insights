@@ -84,10 +84,10 @@ export function MissingDataAlert({ missingDays }: Props) {
   return (
     <div className="bg-card border rounded-lg overflow-hidden">
       {/* Header row */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b bg-amber-50/60">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b bg-rose-50/70">
         <div className="flex items-center gap-2">
-          <AlertTriangle size={13} className="text-amber-500 shrink-0" />
-          <span className="text-xs font-semibold text-amber-800">
+          <AlertTriangle size={13} className="text-rose-400 shrink-0" />
+          <span className="text-xs font-semibold text-rose-800">
             {visible.length} missing trading {visible.length === 1 ? 'day' : 'days'} — click a date to fill it in
           </span>
         </div>
