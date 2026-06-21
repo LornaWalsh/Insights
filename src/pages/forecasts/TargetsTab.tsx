@@ -152,8 +152,9 @@ export function TargetsTab({ orgId, channels }: Props) {
                           step="0.01"
                           value={val}
                           onChange={e => setVal(ch.id, i + 1, e.target.value)}
+                          onFocus={e => e.target.select()}
                           placeholder="0"
-                          className="w-full px-2 py-1 text-right text-sm border rounded focus:outline-none focus:ring-1 focus:ring-ring bg-background"
+                          className="w-full px-2 py-1 text-right text-sm border rounded focus:outline-none focus:ring-1 focus:ring-ring bg-background [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </td>
                     ))}
