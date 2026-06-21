@@ -20,9 +20,27 @@ export default function DailyInputPage() {
   const urlChannel = searchParams.get('channel')
 
   const [selectedDate, setSelectedDate] = useState(urlDate ?? todayStr)
+  // Staff are always locked to their assigned channel — URL params are ignored for them
   const [selectedChannelId, setSelectedChannelId] = useState<string>(
-    urlChannel ?? profile?.channel_id ?? ''
+    isStaff ? (profile?.channel_id ?? '') : (urlChannel ?? profile?.channel_id ?? '')
   )
+
+  // ── Org (currency) ──────────────────────────────────────────────────────────
+  const { data: org } = useQuery<{ currency: string }>({
+    queryKey: ['org_daily_input', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('organisations')
+        .select('currency')
+        .eq('id', orgId!)
+        .single()
+      if (error) throw error
+      return data
+    },
+    enabled: !!orgId,
+  })
+
+  const currency = org?.currency ?? 'GBP'
 
   // ── Channels ────────────────────────────────────────────────────────────────
   const { data: channels = [] } = useQuery<SalesChannel[]>({
@@ -40,9 +58,9 @@ export default function DailyInputPage() {
     enabled: !!orgId,
   })
 
-  // Set default channel once channels load — skip if URL param or profile already set it
+  // Set default channel once channels load — admins/managers only; staff are always locked to their profile channel
   useEffect(() => {
-    if (!selectedChannelId && channels.length > 0) {
+    if (!isStaff && !selectedChannelId && channels.length > 0) {
       setSelectedChannelId(channels[0].id)
     }
   }, [channels]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -97,6 +115,20 @@ export default function DailyInputPage() {
   const isReadOnly = isStaff && existingRecord !== null
 
   if (!orgId) return null
+
+  if (isStaff && !profile?.channel_id) {
+    return (
+      <div className="max-w-2xl space-y-6">
+        <div>
+          <h1 className="text-xl font-bold text-foreground">Daily Input</h1>
+        </div>
+        <div className="bg-card border rounded-lg p-6 text-center space-y-2">
+          <p className="text-sm font-medium text-foreground">No channel assigned</p>
+          <p className="text-sm text-muted-foreground">You haven't been assigned to a channel yet. Contact your administrator to get set up.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -153,6 +185,7 @@ export default function DailyInputPage() {
           existing={existingRecord}
           isReadOnly={isReadOnly}
           onSaved={handleSaved}
+          currency={currency}
         />
       )}
 
@@ -185,9 +218,9 @@ export default function DailyInputPage() {
                         weekday: 'short', day: 'numeric', month: 'short'
                       })}
                     </td>
-                    <td className="px-4 py-2.5 text-right font-medium">{formatCurrency(row.sales)}</td>
+                    <td className="px-4 py-2.5 text-right font-medium">{formatCurrency(row.sales, currency)}</td>
                     <td className="px-4 py-2.5 text-right text-muted-foreground">{row.orders}</td>
-                    <td className="px-4 py-2.5 text-right text-muted-foreground">{formatCurrency(row.aov)}</td>
+                    <td className="px-4 py-2.5 text-right text-muted-foreground">{formatCurrency(row.aov, currency)}</td>
                     {canEdit && (
                       <td className="px-4 py-2.5 text-right text-xs text-primary">
                         {row.performance_date === selectedDate ? 'Selected' : 'Edit'}
