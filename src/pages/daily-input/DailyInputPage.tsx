@@ -142,13 +142,22 @@ export default function DailyInputPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-sm font-medium text-foreground">Date</label>
-            <input
-              type="date"
-              value={selectedDate}
-              max={todayStr}
-              onChange={e => setSelectedDate(e.target.value)}
-              className="w-full px-3 py-2 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            />
+            {isStaff ? (
+              <input
+                type="text"
+                readOnly
+                value={new Date(todayStr + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                className="w-full px-3 py-2 rounded-md border bg-muted text-sm text-muted-foreground cursor-not-allowed"
+              />
+            ) : (
+              <input
+                type="date"
+                value={selectedDate}
+                max={todayStr}
+                onChange={e => setSelectedDate(e.target.value)}
+                className="w-full px-3 py-2 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            )}
           </div>
 
           <div className="space-y-1">
