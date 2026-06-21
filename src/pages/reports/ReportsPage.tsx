@@ -27,6 +27,8 @@ export default function ReportsPage() {
   const queryClient = useQueryClient()
   const orgId = profile?.organisation_id ?? ''
   const userId = profile?.id ?? ''
+  const isManager = profile?.role === 'manager'
+  const managerChannelId = profile?.channel_id ?? null
 
   const [reportId, setReportId] = useState(REPORTS[0].id)
   const [dateFrom, setDateFrom] = useState(monthStart())
@@ -48,8 +50,11 @@ export default function ReportsPage() {
         .eq('is_active', true)
         .order('name')
       if (error) throw error
-      // Default: all selected
-      setSelectedChannels(new Set(data.map((c: SalesChannel) => c.id)))
+      // Default: all selected (admin), or locked to manager's channel
+      const ids = isManager && managerChannelId
+        ? [managerChannelId]
+        : data.map((c: SalesChannel) => c.id)
+      setSelectedChannels(new Set(ids))
       return data
     },
     enabled: !!orgId,
@@ -87,7 +92,9 @@ export default function ReportsPage() {
     }
   }
 
-  const channelIds = allChannels ? channels.map(c => c.id) : [...selectedChannels]
+  const channelIds = isManager && managerChannelId
+    ? [managerChannelId]
+    : allChannels ? channels.map(c => c.id) : [...selectedChannels]
 
   async function handleDownload() {
     if (channelIds.length === 0) { setError('Select at least one channel.'); return }
@@ -248,24 +255,33 @@ export default function ReportsPage() {
         {/* Channel selector */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">Channels</label>
-          <div className="border rounded-lg overflow-hidden divide-y">
-            <label className="flex items-center gap-3 px-4 py-2.5 bg-muted/40 cursor-pointer hover:bg-muted/60">
-              <input type="checkbox" checked={allChannels} onChange={toggleAll} className="rounded" />
-              <span className="text-sm font-medium text-foreground">All channels</span>
-            </label>
-            {channels.map(ch => (
-              <label key={ch.id} className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-muted/30 bg-card">
-                <input
-                  type="checkbox"
-                  checked={selectedChannels.has(ch.id)}
-                  onChange={() => toggleChannel(ch.id)}
-                  className="rounded"
-                />
-                <span className="text-sm text-foreground">{ch.name}</span>
-                <span className="text-xs text-muted-foreground ml-auto capitalize">{ch.channel_type.replace(/_/g, ' ')}</span>
+          {isManager ? (
+            <input
+              type="text"
+              readOnly
+              value={channels.find(c => c.id === managerChannelId)?.name ?? '…'}
+              className="w-full px-3 py-2 rounded-md border bg-muted text-sm text-muted-foreground cursor-not-allowed"
+            />
+          ) : (
+            <div className="border rounded-lg overflow-hidden divide-y">
+              <label className="flex items-center gap-3 px-4 py-2.5 bg-muted/40 cursor-pointer hover:bg-muted/60">
+                <input type="checkbox" checked={allChannels} onChange={toggleAll} className="rounded" />
+                <span className="text-sm font-medium text-foreground">All channels</span>
               </label>
-            ))}
-          </div>
+              {channels.map(ch => (
+                <label key={ch.id} className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-muted/30 bg-card">
+                  <input
+                    type="checkbox"
+                    checked={selectedChannels.has(ch.id)}
+                    onChange={() => toggleChannel(ch.id)}
+                    className="rounded"
+                  />
+                  <span className="text-sm text-foreground">{ch.name}</span>
+                  <span className="text-xs text-muted-foreground ml-auto capitalize">{ch.channel_type.replace(/_/g, ' ')}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
