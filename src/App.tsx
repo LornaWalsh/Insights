@@ -16,6 +16,7 @@ import ForecastsPage from '@/pages/forecasts/ForecastsPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
 import TermsPage from '@/pages/legal/TermsPage'
 import PrivacyPage from '@/pages/legal/PrivacyPage'
+import ResetPasswordPage from '@/pages/auth/ResetPasswordPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +52,7 @@ export default function App() {
           <Routes>
             {/* Public */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/accept-invite" element={<AcceptInvitePage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             <Route path="/terms" element={<TermsPage />} />

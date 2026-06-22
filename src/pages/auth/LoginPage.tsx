@@ -8,6 +8,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
   const navigate = useNavigate()
   const { profile } = useAuth()
 
@@ -44,6 +46,17 @@ export default function LoginPage() {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred.')
       setLoading(false)
     }
+  }
+
+  async function handleForgotPassword() {
+    if (!email) { setError('Enter your email address above first.'); return }
+    setResetLoading(true)
+    setError('')
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    setResetLoading(false)
+    setResetSent(true)
   }
 
   return (
@@ -92,6 +105,9 @@ export default function LoginPage() {
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
+            {resetSent && (
+              <p className="text-sm text-green-600">Reset link sent — check your inbox.</p>
+            )}
 
             <button
               type="submit"
@@ -100,6 +116,17 @@ export default function LoginPage() {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={resetLoading}
+                className="text-xs text-muted-foreground hover:text-foreground underline disabled:opacity-50"
+              >
+                {resetLoading ? 'Sending...' : 'Forgot password?'}
+              </button>
+            </div>
           </form>
         </div>
 
