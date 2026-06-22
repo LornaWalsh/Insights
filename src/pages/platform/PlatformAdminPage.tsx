@@ -116,7 +116,7 @@ export default function PlatformAdminPage() {
     })
 
     if (!ok) {
-      setError(json.error ?? 'Something went wrong.')
+      setError((json.error as string) ?? 'Something went wrong.')
       setSaving(false)
       return
     }
@@ -163,7 +163,7 @@ export default function PlatformAdminPage() {
 
     const { ok, json } = await callFunction('delete-org', { organisation_id: deleteOrg.id })
 
-    if (!ok) { setError(json.error ?? 'Delete failed.'); setDeleting(false); return }
+    if (!ok) { setError((json.error as string) ?? 'Delete failed.'); setDeleting(false); return }
 
     setDeleteOrg(null)
     setDeleting(false)

@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { Download, Clock } from 'lucide-react'
 import type { SalesChannel, DailyPerformance, ForecastTarget } from '@/types'
-import { REPORTS, REPORT_GROUPS, type ReportDef } from './reportTypes'
+import { REPORTS, REPORT_GROUPS } from './reportTypes'
 import {
   generateDailyActuals, generateForecastData, generateActualsVsForecast,
   generateSummaryKPIs, generateChannelMTDPerformance, generateChannelMTDvsLY,

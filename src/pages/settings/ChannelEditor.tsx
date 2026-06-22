@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { X, Plus } from 'lucide-react'
+import { X } from 'lucide-react'
 import type { SalesChannel, ChannelType } from '@/types'
 
 const CHANNEL_TYPE_LABELS: Record<ChannelType, string> = {
