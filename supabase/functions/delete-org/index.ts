@@ -48,7 +48,8 @@ Deno.serve(async (req) => {
     // 2. Delete auth users via service role (removes their profiles via FK cascade)
     if (profiles && profiles.length > 0) {
       for (const profile of profiles) {
-        await adminClient.auth.admin.deleteUser(profile.id)
+        const { error: authErr } = await adminClient.auth.admin.deleteUser(profile.id)
+        if (authErr) console.error(`Failed to delete auth user ${profile.id}:`, authErr.message)
       }
     }
 
