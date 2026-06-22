@@ -63,6 +63,7 @@ export default function UsersPage() {
         .from('profiles')
         .select('id, full_name, email, role, channel_id, invited_at, last_sign_in_at')
         .eq('organisation_id', orgId!)
+        .neq('role', 'admin')
         .order('role')
         .order('full_name')
       if (error) throw error
