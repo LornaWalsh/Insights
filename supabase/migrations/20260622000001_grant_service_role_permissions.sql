@@ -7,4 +7,3 @@ GRANT ALL ON public.sales_channels      TO service_role;
 GRANT ALL ON public.daily_performance   TO service_role;
 GRANT ALL ON public.daily_forecasts     TO service_role;
 GRANT ALL ON public.forecast_targets    TO service_role;
-GRANT ALL ON public.imports             TO service_role;
