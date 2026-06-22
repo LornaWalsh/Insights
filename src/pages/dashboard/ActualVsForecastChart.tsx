@@ -63,7 +63,7 @@ export function ActualVsForecastChart({ data, currency }: Props) {
               `${symbol}${(value as number).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
               name as string,
             ]}
-            labelFormatter={(date: string) => formatTooltipDate(date)}
+            labelFormatter={(date) => formatTooltipDate(date as string)}
             contentStyle={{
               fontSize: 12,
               borderRadius: 6,
