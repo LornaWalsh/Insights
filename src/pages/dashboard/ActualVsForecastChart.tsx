@@ -59,9 +59,9 @@ export function ActualVsForecastChart({ data, currency }: Props) {
             width={56}
           />
           <Tooltip
-            formatter={(value: number, name: string) => [
-              `${symbol}${value.toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
-              name,
+            formatter={(value, name) => [
+              `${symbol}${(value as number).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+              name as string,
             ]}
             labelFormatter={(date: string) => formatTooltipDate(date)}
             contentStyle={{

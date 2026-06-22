@@ -145,6 +145,8 @@ export default function SettingsPage() {
     queryClient.invalidateQueries({ queryKey: ['org_settings', orgId] })
     queryClient.invalidateQueries({ queryKey: ['org_dashboard', orgId] })
     queryClient.invalidateQueries({ queryKey: ['org_forecasts', orgId] })
+    queryClient.invalidateQueries({ queryKey: ['org_daily_input', orgId] })
+    queryClient.invalidateQueries({ queryKey: ['org_onboarding', orgId] })
     setCurrencySaved(true)
     setTimeout(() => setCurrencySaved(false), 3000)
   }

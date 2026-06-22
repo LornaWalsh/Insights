@@ -178,7 +178,7 @@ export function GenerateTab({ orgId, channels, currency }: Props) {
         <ul className="text-xs text-muted-foreground space-y-1 ml-5 list-disc">
           <li><span className="font-medium">Online Store channels:</span> monthly target ÷ every calendar day in the month</li>
           <li><span className="font-medium">All other channels:</span> monthly target ÷ trading days only (your weekday schedule, minus any closed dates)</li>
-          <li>Non-trading days and closed dates receive £0</li>
+          <li>Non-trading days and closed dates receive zero</li>
           <li>Pence-level arithmetic ensures the daily figures sum exactly to the monthly target</li>
         </ul>
       </div>

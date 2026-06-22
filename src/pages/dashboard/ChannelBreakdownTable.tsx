@@ -21,7 +21,7 @@ export function ChannelBreakdownTable({ rows, currency }: Props) {
               <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Channel</th>
               <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground">Actual Sales</th>
               <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground">Monthly Target</th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground">Variance (£)</th>
+              <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground">Variance</th>
               <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground">Variance (%)</th>
               <th className="text-right px-4 py-2.5 text-xs font-medium text-muted-foreground">Days Recorded</th>
             </tr>

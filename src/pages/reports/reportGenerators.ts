@@ -124,7 +124,7 @@ export function generateActualsVsForecast(
 ): string {
   const header = [
     'Year', 'Month', 'Channel',
-    'Actual Sales', 'Forecast Revenue', 'Variance £', 'Variance %',
+    'Actual Sales', 'Forecast Revenue', 'Variance', 'Variance %',
   ]
 
   // Aggregate actuals by channel+month
@@ -201,7 +201,7 @@ export function generateChannelMTDPerformance(
   month: number,
 ): string {
   const header = [
-    'Channel', 'Actual Sales MTD', 'Monthly Target', 'Variance £', 'Variance %',
+    'Channel', 'Actual Sales MTD', 'Monthly Target', 'Variance', 'Variance %',
     'Trading Days Recorded', 'Total Orders', 'AOV',
   ]
 
@@ -237,7 +237,7 @@ export function generateChannelMTDvsLY(
 ): string {
   const header = [
     'Channel', 'Actual Sales This Period', 'Actual Sales Same Period LY',
-    'Variance £', 'Variance %',
+    'Variance', 'Variance %',
   ]
 
   const byChannel = (data: DailyPerformance[]) => {
@@ -268,7 +268,7 @@ export function generateChannelYTDvsForecast(
 ): string {
   const header = [
     'Channel', 'YTD Actual Sales', 'Full Year Forecast Target', 'YTD Forecast Target',
-    'YTD Variance £', 'YTD Variance %',
+    'YTD Variance', 'YTD Variance %',
   ]
 
   // YTD = sum of monthly targets up to and including the latest month in rows
@@ -303,7 +303,7 @@ export function generateChannelYTDvsLY(
 ): string {
   const header = [
     'Channel', 'YTD Actual This Year', 'YTD Actual Last Year',
-    'Variance £', 'Variance %',
+    'Variance', 'Variance %',
   ]
 
   const sumByChannel = (data: DailyPerformance[]) => {

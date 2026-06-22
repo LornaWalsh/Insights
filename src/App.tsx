@@ -23,16 +23,6 @@ const queryClient = new QueryClient({
   },
 })
 
-function ComingSoon({ title }: { title: string }) {
-  return (
-    <div className="flex items-center justify-center h-64">
-      <div className="text-center">
-        <h1 className="text-xl font-semibold text-foreground">{title}</h1>
-        <p className="text-muted-foreground text-sm mt-2">Coming soon</p>
-      </div>
-    </div>
-  )
-}
 
 function UnauthorizedPage() {
   return (

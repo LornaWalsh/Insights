@@ -11,6 +11,11 @@ interface Props {
   existing: DailyPerformance | null
   isReadOnly: boolean // staff viewing existing record
   onSaved: () => void
+  currency: string
+}
+
+function getCurrencySymbol(currency: string) {
+  return (0).toLocaleString('en', { style: 'currency', currency, minimumFractionDigits: 0 }).replace(/\d/g, '').trim()
 }
 
 interface FormState {
@@ -104,8 +109,9 @@ function SectionCard({ title, children }: { title: string; children: React.React
   )
 }
 
-export function DailyInputForm({ organisationId, channelId, performanceDate, existing, isReadOnly, onSaved }: Props) {
+export function DailyInputForm({ organisationId, channelId, performanceDate, existing, isReadOnly, onSaved, currency }: Props) {
   const { profile } = useAuth()
+  const currencySymbol = getCurrencySymbol(currency)
   const [form, setForm] = useState<FormState>(() => initForm(existing))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -230,7 +236,7 @@ export function DailyInputForm({ organisationId, channelId, performanceDate, exi
       {/* Core Trading */}
       <SectionCard title="Core Trading">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {numericInput('Sales', 'sales', form, setForm, { prefix: '£', step: '0.01', required: true })}
+          {numericInput('Sales', 'sales', form, setForm, { prefix: currencySymbol, step: '0.01', required: true })}
           {numericInput('Orders', 'orders', form, setForm, { step: '1', required: true })}
           <div className="space-y-1">
             <label className="text-sm font-medium text-foreground">AOV <span className="text-xs text-muted-foreground font-normal">(auto)</span></label>
@@ -247,7 +253,7 @@ export function DailyInputForm({ organisationId, channelId, performanceDate, exi
       {/* Returns */}
       <SectionCard title="Returns (optional)">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {numericInput('Returns value', 'returns_value', form, setForm, { prefix: '£' })}
+          {numericInput('Returns value', 'returns_value', form, setForm, { prefix: currencySymbol })}
           {numericInput('Returns count', 'returns_count', form, setForm, { step: '1' })}
         </div>
       </SectionCard>
@@ -296,9 +302,9 @@ export function DailyInputForm({ organisationId, channelId, performanceDate, exi
       {/* Ad Spend */}
       <SectionCard title="Ad Spend (optional)">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {numericInput('Facebook / Meta', 'facebook_ad_spend', form, setForm, { prefix: '£' })}
-          {numericInput('Google', 'google_ad_spend', form, setForm, { prefix: '£' })}
-          {numericInput('Other', 'other_ad_spend', form, setForm, { prefix: '£' })}
+          {numericInput('Facebook / Meta', 'facebook_ad_spend', form, setForm, { prefix: currencySymbol })}
+          {numericInput('Google', 'google_ad_spend', form, setForm, { prefix: currencySymbol })}
+          {numericInput('Other', 'other_ad_spend', form, setForm, { prefix: currencySymbol })}
           <div className="space-y-1">
             <label className="text-sm font-medium text-foreground">Other ad spend notes</label>
             <input
