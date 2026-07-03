@@ -176,7 +176,7 @@ export default function PlatformAdminPage() {
       <div className="bg-card border-b px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-foreground">Platform Admin</h1>
-          <p className="text-xs text-muted-foreground">Insight Hub — Lorna Walsh</p>
+          <p className="text-xs text-muted-foreground">Planfore — Lorna Walsh</p>
         </div>
         <div className="flex items-center gap-2">
           <button

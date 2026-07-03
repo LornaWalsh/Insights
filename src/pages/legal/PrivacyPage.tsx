@@ -11,7 +11,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold text-foreground">1. Who We Are</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
             <strong>[COMPANY NAME]</strong> ("<strong>we</strong>", "<strong>us</strong>", "<strong>our</strong>") operates
-            Retail Insight Hub. We are the data controller for personal data collected through this service.
+            Planfore. We are the data controller for personal data collected through this service.
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
             Registered office: <strong>[REGISTERED ADDRESS LINE 1], [TOWN/CITY], [POSTCODE]</strong>
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold text-foreground">3. How We Use Your Data</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">We use your personal data to:</p>
           <ul className="text-sm text-muted-foreground leading-relaxed list-disc ml-5 space-y-1">
-            <li>Provide and maintain the Retail Insight Hub service</li>
+            <li>Provide and maintain the Planfore service</li>
             <li>Manage your account and user access</li>
             <li>Send service-related communications (e.g. password resets, account invitations)</li>
             <li>Investigate and resolve support issues</li>

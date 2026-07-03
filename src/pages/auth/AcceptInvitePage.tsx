@@ -81,7 +81,7 @@ export default function AcceptInvitePage() {
     <div className="min-h-screen bg-muted flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Welcome to Insight Hub</h1>
+          <h1 className="text-2xl font-bold text-foreground">Welcome to Planfore</h1>
           <p className="text-muted-foreground text-sm mt-1">Create a password to activate your account.</p>
         </div>
 

@@ -76,7 +76,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col h-full">
       {/* Brand */}
       <div className="px-6 py-5 border-b">
-        <span className="text-lg font-bold text-foreground">Insight Hub</span>
+        <span className="text-lg font-bold text-foreground">Planfore</span>
         <p className="text-xs text-muted-foreground mt-0.5 truncate">{org?.name ?? '…'}</p>
       </div>
 
@@ -126,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           rel="noopener noreferrer"
           className="text-xs text-muted-foreground px-3 pt-1 hover:text-foreground transition-colors"
         >
-          Insight Hub · by LW
+          Planfore · by LW
         </a>
       </div>
     </div>
@@ -156,7 +156,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button onClick={() => setMobileOpen(true)} className="text-muted-foreground">
             <Menu size={20} />
           </button>
-          <span className="font-semibold text-sm">Insight Hub</span>
+          <span className="font-semibold text-sm">Planfore</span>
           <button onClick={() => setMobileOpen(false)} className="ml-auto text-muted-foreground">
             {mobileOpen ? <X size={20} /> : null}
           </button>

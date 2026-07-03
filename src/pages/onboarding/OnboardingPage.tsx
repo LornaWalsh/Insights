@@ -34,7 +34,7 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-muted flex flex-col items-center justify-start pt-12 px-4">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Welcome to Insight Hub</h1>
+        <h1 className="text-2xl font-bold text-foreground">Welcome to Planfore</h1>
         <p className="text-muted-foreground text-sm mt-1">
           Let's get {profile?.full_name?.split(' ')[0] ?? 'you'} set up — this only takes a few minutes.
         </p>

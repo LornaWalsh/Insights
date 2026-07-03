@@ -10,7 +10,7 @@ export default function TermsPage() {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">1. About Us</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Retail Insight Hub is operated by <strong>[COMPANY NAME]</strong>, a company registered in England and Wales
+            Planfore is operated by <strong>[COMPANY NAME]</strong>, a company registered in England and Wales
             under company number <strong>[COMPANY REGISTRATION NUMBER]</strong>.
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -24,7 +24,7 @@ export default function TermsPage() {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">2. Acceptance of Terms</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            By accessing or using Retail Insight Hub, you agree to be bound by these Terms of Service.
+            By accessing or using Planfore, you agree to be bound by these Terms of Service.
             If you do not agree to these terms, you must not use our service.
           </p>
         </section>
@@ -32,7 +32,7 @@ export default function TermsPage() {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">3. Description of Service</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Retail Insight Hub is a web-based retail analytics platform that allows businesses to record
+            Planfore is a web-based retail analytics platform that allows businesses to record
             daily trading performance, set revenue forecasts, and generate reports. The service is provided
             on a subscription basis.
           </p>
