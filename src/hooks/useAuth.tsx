@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single()
     setProfile(data)
     isUserLoaded.current = true
+    supabase.from('profiles').update({ last_sign_in_at: new Date().toISOString() }).eq('id', userId)
   }
 
   useEffect(() => {
