@@ -76,10 +76,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col h-full">
       {/* Brand */}
       <div className="px-6 py-5 border-b">
-        <svg viewBox="0 0 48 48" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-          <rect width="48" height="48" rx="10" fill="#0d6e6e"/>
-          <text textAnchor="middle" x="24" y="36" fontFamily="system-ui, sans-serif" fontWeight="700" fontSize="28" fill="#ffffff">P<tspan fontSize="15" baselineShift="-6">4</tspan></text>
-        </svg>
+        <span className="text-lg font-bold text-foreground">Planfore</span>
         <p className="text-xs text-muted-foreground mt-0.5 truncate">{org?.name ?? '…'}</p>
       </div>
 
