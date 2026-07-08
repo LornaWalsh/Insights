@@ -20,7 +20,7 @@ export default function PrivacyPage() {
             ICO registration number: <strong>[ICO REGISTRATION NUMBER]</strong>
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Data protection contact: <a href="mailto:[CONTACT EMAIL]" className="text-primary underline">[CONTACT EMAIL]</a>
+            Data protection contact: <a href="mailto:info@planfore.app" className="text-primary underline">info@planfore.app</a>
           </p>
         </section>
 
@@ -115,7 +115,7 @@ export default function PrivacyPage() {
           </ul>
           <p className="text-sm text-muted-foreground leading-relaxed">
             To exercise any of these rights, contact us at{' '}
-            <a href="mailto:[CONTACT EMAIL]" className="text-primary underline">[CONTACT EMAIL]</a>.
+            <a href="mailto:info@planfore.app" className="text-primary underline">info@planfore.app</a>.
             We will respond within 30 days.
           </p>
         </section>

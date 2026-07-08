@@ -403,7 +403,7 @@ export default function UsersPage() {
       )}
 
       <div className="bg-muted/50 border rounded-md px-4 py-3 text-xs text-muted-foreground leading-relaxed">
-        To change an admin account or recover lost admin access, contact <span className="font-medium">lorna@livingstonewalsh.com</span>.
+        To change an admin account or recover lost admin access, contact <span className="font-medium">info@planfore.app</span>.
       </div>
     </div>
   )

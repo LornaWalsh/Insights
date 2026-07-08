@@ -237,7 +237,7 @@ export default function SettingsPage() {
         <div className="bg-muted/50 border rounded-md px-4 py-3 text-xs text-muted-foreground leading-relaxed">
           Your data is stored securely and is completely isolated from other organisations. Only members
           of your organisation can access your data. To change your organisation name, contact
-          <span className="font-medium"> lorna@livingstonewalsh.com</span>.
+          <span className="font-medium"> info@planfore.app</span>.
         </div>
       </SectionCard>
 

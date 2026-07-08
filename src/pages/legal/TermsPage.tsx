@@ -17,7 +17,7 @@ export default function TermsPage() {
             Registered office: <strong>[REGISTERED ADDRESS LINE 1], [TOWN/CITY], [POSTCODE]</strong>
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            You can contact us at: <a href="mailto:[CONTACT EMAIL]" className="text-primary underline">[CONTACT EMAIL]</a>
+            You can contact us at: <a href="mailto:info@planfore.app" className="text-primary underline">info@planfore.app</a>
           </p>
         </section>
 
@@ -133,7 +133,7 @@ export default function TermsPage() {
         <div className="border-t pt-6">
           <p className="text-xs text-muted-foreground">
             Questions about these terms? Contact us at{' '}
-            <a href="mailto:[CONTACT EMAIL]" className="text-primary underline">[CONTACT EMAIL]</a>
+            <a href="mailto:info@planfore.app" className="text-primary underline">info@planfore.app</a>
           </p>
         </div>
       </div>
