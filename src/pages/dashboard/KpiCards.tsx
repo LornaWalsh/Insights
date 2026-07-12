@@ -4,6 +4,8 @@ import type { DashboardData } from '@/lib/dashboardCalcs'
 interface Props {
   data: DashboardData
   currency: string
+  cutoffDay: number
+  daysInMonth: number
 }
 
 interface CardProps {
@@ -28,12 +30,14 @@ function KpiCard({ label, value, sub, highlight }: CardProps) {
   )
 }
 
-export function KpiCards({ data, currency }: Props) {
+export function KpiCards({ data, currency, cutoffDay, daysInMonth }: Props) {
   const {
-    mtdSales, monthlyTarget, mtdForecast,
+    mtdSales, monthlyTarget, proRataTarget, mtdForecast,
     varianceValue, variancePct,
     actualDailyAvg, requiredDailyAvg,
   } = data
+
+  const isPartialMonth = cutoffDay < daysInMonth
 
   const varianceHighlight: CardProps['highlight'] =
     varianceValue > 0 ? 'positive' : varianceValue < 0 ? 'negative' : 'neutral'
@@ -46,12 +50,13 @@ export function KpiCards({ data, currency }: Props) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
       <KpiCard
-        label="MTD Sales"
+        label={isPartialMonth ? `Sales to Day ${cutoffDay}` : 'MTD Sales'}
         value={formatCurrency(mtdSales, currency)}
       />
       <KpiCard
-        label="Monthly Target"
-        value={formatCurrency(monthlyTarget, currency)}
+        label={isPartialMonth ? `Target to Day ${cutoffDay}` : 'Monthly Target'}
+        value={formatCurrency(isPartialMonth ? proRataTarget : monthlyTarget, currency)}
+        sub={isPartialMonth ? `Full month: ${formatCurrency(monthlyTarget, currency)}` : undefined}
       />
       <KpiCard
         label="Variance"

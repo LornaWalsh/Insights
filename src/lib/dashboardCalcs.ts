@@ -82,6 +82,7 @@ export interface DashboardData {
   // KPI cards
   mtdSales: number
   monthlyTarget: number
+  proRataTarget: number  // monthly target scaled to elapsedCount / daysInMonth
   mtdForecast: number
   varianceValue: number
   variancePct: number | null
@@ -108,15 +109,20 @@ export function computeDashboard(
   performance: DailyPerformance[],  // all rows for this month (all channels)
   targets: ForecastTarget[],        // all rows for this year/month (all channels)
   selectedChannelId: string | null, // null = all channels
-  todayStr: string,                 // YYYY-MM-DD
-  dataStartDate: string             // YYYY-MM-DD — org created_at date, missing days not flagged before this
+  todayStr: string,                 // YYYY-MM-DD — actual today, used for pace line
+  dataStartDate: string,            // YYYY-MM-DD — org created_at date, missing days not flagged before this
+  cutoffDate?: string               // YYYY-MM-DD — if set, MTD calculations cut off at this date instead of today
 ): DashboardData {
   const allDays = getDaysInMonth(year, month)
   const todayIdx = allDays.indexOf(todayStr)
   const isCurrentMonth = todayIdx >= 0
 
-  // Days up to and including today (or all days for past months)
-  const elapsedCount = isCurrentMonth ? todayIdx + 1 : allDays.length
+  // Use cutoffDate for MTD window if provided; otherwise fall back to today
+  const effectiveCutoff = cutoffDate ?? todayStr
+  const cutoffIdx = allDays.indexOf(effectiveCutoff)
+
+  // Days up to and including the cutoff (or all days for past months)
+  const elapsedCount = cutoffIdx >= 0 ? cutoffIdx + 1 : allDays.length
   const elapsedDays = allDays.slice(0, elapsedCount)
 
   // Active channels for the selected filter
@@ -133,7 +139,7 @@ export function computeDashboard(
   // Performance lookup: "channelId|date" → sales
   const perfMap: Record<string, number> = {}
   for (const p of performance) {
-    if (p.performance_date <= todayStr) { // guard against future-dated entries
+    if (p.performance_date <= effectiveCutoff) { // guard against future-dated entries
       perfMap[`${p.channel_id}|${p.performance_date}`] = p.sales
     }
   }
@@ -145,7 +151,7 @@ export function computeDashboard(
 
   for (const dateStr of allDays) {
     const dayNum = parseInt(dateStr.split('-')[2])
-    const isPastOrToday = dateStr <= todayStr
+    const isPastOrToday = dateStr <= effectiveCutoff
 
     // Cumulative forecast for this day
     for (const ch of activeChannels) {
@@ -177,6 +183,7 @@ export function computeDashboard(
   // ── KPIs ────────────────────────────────────────────────────────────────────
   const mtdSales = cumulativeActual
   const monthlyTarget = activeChannels.reduce((sum, ch) => sum + (targetByChannel[ch.id] ?? 0), 0)
+  const proRataTarget = allDays.length > 0 ? (monthlyTarget * elapsedCount) / allDays.length : 0
   const mtdForecast = elapsedCount > 0 ? (chartData[elapsedCount - 1]?.forecast ?? 0) : 0
 
   const varianceValue = mtdSales - mtdForecast
@@ -269,6 +276,7 @@ export function computeDashboard(
   return {
     mtdSales,
     monthlyTarget,
+    proRataTarget,
     mtdForecast,
     varianceValue,
     variancePct,

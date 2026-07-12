@@ -33,18 +33,25 @@ export default function DashboardPage() {
     isManager ? (profile?.channel_id ?? null) : null
   )
 
+  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1
+  const canGoNext = !isCurrentMonth // can't navigate into the future
+
+  // Day-of-month selector: defaults to today for the current month,
+  // or the last day of the month for past months
+  const defaultCutoffDay = isCurrentMonth ? now.getDate() : null
+  const [cutoffDay, setCutoffDay] = useState<number | null>(defaultCutoffDay)
+
   function prevMonth() {
     if (month === 1) { setYear(y => y - 1); setMonth(12) }
     else setMonth(m => m - 1)
+    setCutoffDay(null) // reset to full-month view when navigating to a past month
   }
 
   function nextMonth() {
     if (month === 12) { setYear(y => y + 1); setMonth(1) }
     else setMonth(m => m + 1)
+    setCutoffDay(now.getDate()) // reset to today when navigating back to current month
   }
-
-  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1
-  const canGoNext = !isCurrentMonth // can't navigate into the future
 
   // ── Queries ──────────────────────────────────────────────────────────────────
 
@@ -100,6 +107,11 @@ export default function DashboardPage() {
   const firstDay = allDays[0]
   const lastDay = allDays[allDays.length - 1]
 
+  // Cutoff date: if a specific day is selected, build a YYYY-MM-DD for it
+  const cutoffDateStr = cutoffDay !== null
+    ? `${year}-${String(month).padStart(2, '0')}-${String(cutoffDay).padStart(2, '0')}`
+    : undefined
+
   const { data: performance = [], isLoading: perfLoading } = useQuery<DailyPerformance[]>({
     queryKey: ['daily_performance', orgId, year, month],
     queryFn: async () => {
@@ -136,16 +148,16 @@ export default function DashboardPage() {
     if (!channels.length || !org) return null
     return computeDashboard(
       year, month, channels, closedDates,
-      performance, targets, selectedChannelId, todayStr, dataStartDate
+      performance, targets, selectedChannelId, todayStr, dataStartDate, cutoffDateStr
     )
-  }, [year, month, channels, closedDates, performance, targets, selectedChannelId, todayStr])
+  }, [year, month, channels, closedDates, performance, targets, selectedChannelId, todayStr, cutoffDateStr])
 
   const currency = org?.currency ?? 'GBP'
 
   // ── Progress bar labels ───────────────────────────────────────────────────────
   const daysInMonth = allDays.length
-  const dayOfMonth = isCurrentMonth ? now.getDate() : daysInMonth
-  const monthLabel = `Day ${dayOfMonth} of ${daysInMonth}`
+  const displayDay = cutoffDay ?? (isCurrentMonth ? now.getDate() : daysInMonth)
+  const monthLabel = `Day ${displayDay} of ${daysInMonth}`
   const targetLabel = dashData
     ? `${formatCurrency(dashData.mtdSales, currency)} of ${formatCurrency(dashData.monthlyTarget, currency)}`
     : '—'
@@ -179,6 +191,27 @@ export default function DashboardPage() {
               ))}
             </select>
           )}
+
+          {/* Day-of-month selector */}
+          <div className="flex items-center gap-1.5">
+            <label className="text-xs text-muted-foreground whitespace-nowrap">View to day</label>
+            <select
+              value={cutoffDay ?? daysInMonth}
+              onChange={e => {
+                const val = parseInt(e.target.value)
+                // If current month and user picks today, treat as "no cutoff override"
+                setCutoffDay(isCurrentMonth && val === now.getDate() ? val : val)
+              }}
+              className="px-2 py-1.5 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring w-16"
+            >
+              {allDays.map((_, i) => {
+                const d = i + 1
+                // For current month, don't allow selecting future days
+                if (isCurrentMonth && d > now.getDate()) return null
+                return <option key={d} value={d}>{d}</option>
+              })}
+            </select>
+          </div>
 
           {/* Month navigation */}
           <div className="flex items-center gap-1">
@@ -216,7 +249,12 @@ export default function DashboardPage() {
           )}
 
           {/* KPI cards */}
-          <KpiCards data={dashData} currency={currency} />
+          <KpiCards
+            data={dashData}
+            currency={currency}
+            cutoffDay={cutoffDay ?? displayDay}
+            daysInMonth={daysInMonth}
+          />
 
           {/* Progress bars */}
           <ProgressBars
