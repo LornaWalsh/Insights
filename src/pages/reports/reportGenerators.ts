@@ -61,7 +61,7 @@ export function generateDailyActuals(rows: DailyPerformance[], channels: SalesCh
     'Date', 'Channel', 'Sales', 'Orders', 'AOV',
     'Returns Value', 'Returns Count', 'Returns Rate %',
     'Footfall', 'Conversion Rate', 'Returning Customers', 'Signups',
-    'Discounted Orders', 'Facebook Ad Spend', 'Google Ad Spend',
+    'Discounted Orders', 'Discounted Value', 'Facebook Ad Spend', 'Google Ad Spend',
     'Other Ad Spend', 'Other Ad Spend Notes',
   ]
   const data = rows.map(r => {
@@ -72,7 +72,7 @@ export function generateDailyActuals(rows: DailyPerformance[], channels: SalesCh
       r.sales, r.orders, r.aov,
       r.returns_value, r.returns_count, returnsRate,
       r.footfall, r.conversion_rate,
-      r.returning_customers, r.signups, r.discounted_orders,
+      r.returning_customers, r.signups, r.discounted_orders, r.discounted_value,
       r.facebook_ad_spend, r.google_ad_spend,
       r.other_ad_spend, r.other_ad_spend_notes,
     ]
@@ -162,7 +162,7 @@ export function generateSummaryKPIs(rows: DailyPerformance[], channels: SalesCha
   const header = [
     'Channel', 'Total Sales', 'Total Orders', 'AOV',
     'Total Returns Value', 'Returns Rate %', 'Total Footfall', 'Avg Conversion Rate %',
-    'Total Returning Customers', 'Total Signups', 'Total Discounted Orders',
+    'Total Returning Customers', 'Total Signups', 'Total Discounted Orders', 'Total Discounted Value',
   ]
 
   const byChannel = new Map<string, DailyPerformance[]>()
@@ -186,6 +186,7 @@ export function generateSummaryKPIs(rows: DailyPerformance[], channels: SalesCha
       sumField(ch, 'returning_customers'),
       sumField(ch, 'signups'),
       sumField(ch, 'discounted_orders'),
+      sumField(ch, 'discounted_value'),
     ]
   })
 
@@ -331,7 +332,7 @@ export function generateOpsMTDSummary(rows: DailyPerformance[], channels: SalesC
     'Channel', 'Sales', 'Orders', 'AOV',
     'Returns Value', 'Returns Count', 'Returns Rate %',
     'Total Footfall', 'Avg Conversion Rate %',
-    'Total Returning Customers', 'Total Signups', 'Total Discounted Orders',
+    'Total Returning Customers', 'Total Signups', 'Total Discounted Orders', 'Total Discounted Value',
   ]
 
   const byChannel = new Map<string, DailyPerformance[]>()
@@ -355,6 +356,7 @@ export function generateOpsMTDSummary(rows: DailyPerformance[], channels: SalesC
       sumField(chRows, 'returning_customers'),
       sumField(chRows, 'signups'),
       sumField(chRows, 'discounted_orders'),
+      sumField(chRows, 'discounted_value'),
     ]
   })
 
@@ -433,7 +435,7 @@ export function generateMarketingMonthlyKPIs(rows: DailyPerformance[], channels:
     'Year', 'Month', 'Channel',
     'Facebook Ad Spend', 'Google Ad Spend', 'Other Ad Spend', 'Total Ad Spend',
     'Traffic / Footfall', 'Avg Conversion Rate %',
-    'Returning Customers', 'Signups', 'Discounted Orders',
+    'Returning Customers', 'Signups', 'Discounted Orders', 'Discounted Value',
   ]
 
   const grouped = byChannelMonth(rows)
@@ -453,6 +455,7 @@ export function generateMarketingMonthlyKPIs(rows: DailyPerformance[], channels:
         sumField(chRows, 'returning_customers'),
         sumField(chRows, 'signups'),
         sumField(chRows, 'discounted_orders'),
+        sumField(chRows, 'discounted_value'),
       ])
     }
   }
