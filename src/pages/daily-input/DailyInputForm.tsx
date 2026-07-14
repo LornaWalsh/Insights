@@ -29,6 +29,7 @@ interface FormState {
   returning_customers: string
   signups: string
   discounted_orders: string
+  discounted_value: string
   facebook_ad_spend: string
   google_ad_spend: string
   other_ad_spend: string
@@ -46,7 +47,7 @@ function initForm(existing: DailyPerformance | null): FormState {
       footfall: '', conversion_rate: '', conversion_rate_overridden: false,
       returning_customers: '', signups: '', discounted_orders: '',
       facebook_ad_spend: '', google_ad_spend: '', other_ad_spend: '',
-      other_ad_spend_notes: '',
+      other_ad_spend_notes: '', discounted_value: '',
     }
   }
   return {
@@ -60,6 +61,7 @@ function initForm(existing: DailyPerformance | null): FormState {
     returning_customers: toStr(existing.returning_customers),
     signups: toStr(existing.signups),
     discounted_orders: toStr(existing.discounted_orders),
+    discounted_value: toStr(existing.discounted_value),
     facebook_ad_spend: toStr(existing.facebook_ad_spend),
     google_ad_spend: toStr(existing.google_ad_spend),
     other_ad_spend: toStr(existing.other_ad_spend),
@@ -185,6 +187,7 @@ export function DailyInputForm({ organisationId, channelId, performanceDate, exi
       returning_customers: form.returning_customers !== '' ? parseInt(form.returning_customers) : null,
       signups: form.signups !== '' ? parseInt(form.signups) : null,
       discounted_orders: form.discounted_orders !== '' ? parseInt(form.discounted_orders) : null,
+      discounted_value: form.discounted_value !== '' ? parseFloat(form.discounted_value) : null,
       facebook_ad_spend: form.facebook_ad_spend !== '' ? parseFloat(form.facebook_ad_spend) : null,
       google_ad_spend: form.google_ad_spend !== '' ? parseFloat(form.google_ad_spend) : null,
       other_ad_spend: form.other_ad_spend !== '' ? parseFloat(form.other_ad_spend) : null,
@@ -296,6 +299,7 @@ export function DailyInputForm({ organisationId, channelId, performanceDate, exi
           {numericInput('Returning customers', 'returning_customers', form, setForm, { step: '1' })}
           {numericInput('New signups', 'signups', form, setForm, { step: '1' })}
           {numericInput('Discounted orders', 'discounted_orders', form, setForm, { step: '1' })}
+          {numericInput('Discounted value', 'discounted_value', form, setForm, { prefix: currencySymbol })}
         </div>
       </SectionCard>
 

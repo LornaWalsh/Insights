@@ -58,6 +58,7 @@ export interface DailyPerformance {
   returning_customers: number | null
   signups: number | null
   discounted_orders: number | null
+  discounted_value: number | null
   facebook_ad_spend: number | null
   google_ad_spend: number | null
   other_ad_spend: number | null
